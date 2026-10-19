@@ -63,6 +63,20 @@ function everyTick(minutes: number, onTick: (minute: number)) {
 everyTick(3, (minute) => console.log(`Minute ${minute}`))
 
 ## React components and props
+React components are TypeScript functions that return HTML elements, you can pass in props like variables to make more complex HTML elements. A component only takes in one variable - the props, which should be stored in its own interface, and can be accessed by props.attribute similar to a class but as the props are just data not methods it is better to use an interface.
+e.g.
+interface PanelProps {
+    title: string;
+}
+
+function Panel (props: PanelProps) {
+    return (
+        <section>
+            <h2>props.title</h2>
+            {props.children}
+        </section>
+    )
+}
 
 ## useState
 

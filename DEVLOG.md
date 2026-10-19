@@ -2,6 +2,11 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-10-19 - Licence decision
+- **Done:** Changed licence to all rights reserved from MIT so the code cannot be sold or used by others - allowing recruiters to still view the code but protecting a future paid release.
+- **Next:** #2, TypeScript and React spike.
+- **Blocked:** Nothing.
+
 ## 2026-10-19 - Sprint 0 planning
 - **Done:** Sprint 0 planned. Goal: "A map of Plymouth is live at a public URL, with CI guarding main". 7 issues, 14 points, moved to Sprint Backlog.
 - **Next:** #15, choose the project licence.

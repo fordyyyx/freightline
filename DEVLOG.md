@@ -2,6 +2,11 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-10-19 - Sprint 0 planning
+- **Done:** Sprint 0 planned. Goal: "A map of Plymouth is live at a public URL, with CI guarding main". 7 issues, 14 points, moved to Sprint Backlog.
+- **Next:** #15, choose the project licence.
+- **Blocked:** Nothing.
+
 ## 2026-10-15 - Impromptu planning
 - **Done:** Added desktop and Steam roadmap, commercial-readiness rules, and the licence task (S0-7).
 - **Next:** Sprint 0 planning on Monday 19 October.

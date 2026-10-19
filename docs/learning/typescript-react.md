@@ -43,6 +43,24 @@ function formatDeadline(deadline: Deadline): string {
 }
 
 ## Typing function parameters and return values
+Typing parameters and return values means TypeScript is able to check for errors that you might miss from invalid return types of functions, where it returns a number which you try to interpret as a string for example. void is used when a function does not need to return anything so TypeScript does not show an error for a function not returning the specified type, while undefined is used when the function does need a return but the return may be different for example searching through a list for a specific item, if the item is not found then undefined would be returned.
+e.g.
+function formatPence(pence: number) {
+    return `£${(pence / 100).toFixed(2)}`;
+}
+
+function jobPayPence(distanceKm: number, ratePencePerKm: number, bonusPence: number = 0): number {
+    let jobPay: number = distanceKm * ratePencePerKm + bonusPence;
+    return jobPay
+}
+
+function everyTick(minutes: number, onTick: (minute: number)) {
+    for (let i = 1; i <= minutes; i++) {
+        onTick(i);
+    }
+}
+
+everyTick(3, (minute) => console.log(`Minute ${minute}`))
 
 ## React components and props
 

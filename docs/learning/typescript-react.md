@@ -11,6 +11,36 @@ interface Van {
 const luton: Van = { id: 'AK69ZTO', capacityKg: 750, status: 'idle' };
 
 ## Union types
+Union types allow you to specify a list of allowed types rather than using 'any' or limiting to one specific type. TypeScript checks this as you write them and also uses type narrowing in conditional blocks, so as to not show errors when one type has already been handled.
+e.g.
+type VanStatus = 'idle' | 'loading' | 'driving';
+
+interface Van {
+    id: string;
+    capacityKg: number;
+    status: VanStatus;
+}
+
+function describeStatus(status: VanStatus): string {
+    switch (status) {
+        case 'idle':
+            return "Van is idle."
+        case 'loading':
+            return "Van is loading."
+        case 'driving':
+            return "Van is driving."
+    }
+}
+
+type Deadline = number | 'none';
+
+function formatDeadline(deadline: Deadline): string {
+    if (deadline === 'none') {
+        return "No deadline";
+    } else {
+        return `Due in ${deadline} minutes`;
+    }
+}
 
 ## Typing function parameters and return values
 

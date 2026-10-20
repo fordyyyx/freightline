@@ -6,12 +6,12 @@ Living document · last updated 14 Oct 2026
 
 ### Planning horizons
 
-| Horizon | Level of detail | Where it lives |
-| --- | --- | --- |
-| Current sprint | Acceptance criteria, estimates, dependencies | Issues in Sprint Backlog |
-| Next sprint | Rough issues, refined on the middle weekend | Issues in Backlog |
-| Rest of v0.1 | One-line stories | Sprint tables in the plan |
-| v0.2 onwards | Epics, mechanics, open questions and ideas | Epic table, plus this document |
+| Horizon        | Level of detail                              | Where it lives                 |
+| -------------- | -------------------------------------------- | ------------------------------ |
+| Current sprint | Acceptance criteria, estimates, dependencies | Issues in Sprint Backlog       |
+| Next sprint    | Rough issues, refined on the middle weekend  | Issues in Backlog              |
+| Rest of v0.1   | One-line stories                             | Sprint tables in the plan      |
+| v0.2 onwards   | Epics, mechanics, open questions and ideas   | Epic table, plus this document |
 
 This document holds mechanics and ideas, not tickets. When a release becomes the next one, its ideas become issues at refinement.
 
@@ -34,16 +34,16 @@ This document holds mechanics and ideas, not tickets. When a release becomes the
 
 ## Design direction (decided 14 Oct 2026)
 
-| Topic | Decision |
-| --- | --- |
-| Long-term goal | Open-ended sandbox, with milestones to aim for and scenarios with set starts and targets |
-| Where vehicles end up | They stay where they finish a delivery; the next job starts from there |
-| Vehicle ownership | Every vehicle has a home depot |
-| Currency | Real currencies. The company keeps its books in the currency of its home depot's country: GBP for a Plymouth start, with an override in settings |
-| Running out of money | Each scenario sets its own rule. Sandbox: bankrupt after 14 days below zero |
-| Pace | At 1×, a game day lasts about 10 real minutes |
-| v0.1 vehicles | Two van models |
-| Drivers (v0.2) | Named people with skill and experience, fatigue and hours, wages and morale, licences and specialities |
+| Topic                 | Decision                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Long-term goal        | Open-ended sandbox, with milestones to aim for and scenarios with set starts and targets                                                         |
+| Where vehicles end up | They stay where they finish a delivery; the next job starts from there                                                                           |
+| Vehicle ownership     | Every vehicle has a home depot                                                                                                                   |
+| Currency              | Real currencies. The company keeps its books in the currency of its home depot's country: GBP for a Plymouth start, with an override in settings |
+| Running out of money  | Each scenario sets its own rule. Sandbox: bankrupt after 14 days below zero                                                                      |
+| Pace                  | At 1×, a game day lasts about 10 real minutes                                                                                                    |
+| v0.1 vehicles         | Two van models                                                                                                                                   |
+| Drivers (v0.2)        | Named people with skill and experience, fatigue and hours, wages and morale, licences and specialities                                           |
 
 ## Data model decisions (made now to protect v0.2 onwards)
 
@@ -51,20 +51,20 @@ These cost little in v0.1 but would be expensive to change once saves exist. The
 
 A row earns its place only if adding it later would mean rewriting code or breaking saves. Anything that only adds a new field waits for its release, and a save migration handles it then.
 
-| Area | Decision | Why now |
-| --- | --- | --- |
-| Depots | The company has a **list** of depots, which contains one in v0.1 | v0.2 adds depots instead of rewriting everything that assumes one |
-| Company headquarters | One depot is the headquarters, and it sets the company's currency | Scenarios can start anywhere, and the currency follows |
-| Vehicle location | A vehicle is either **at a place** (any town) or **travelling a leg** between two places | Vehicles staying where they finish needs this from v0.1 |
-| Vehicle home depot | Every vehicle stores a `homeDepotId` | Servicing, driver bases and per-depot fleets in v0.2 |
-| Vehicle models | A general model: transport mode (road, sea or air), capacity, speed, price, fuel use, maintenance, and the licence needed | Trucks, ships and planes are new data, not new code |
-| Trips | A trip is a **list of legs**, each with a mode, start and end. In v0.1 a job has two road legs: empty to the pickup, then loaded to the destination | Ferries, tunnels and sea or air legs slot in later |
-| Places | Every town carries a country code. Port and airport flags are added later | Borders and currencies hang off the country |
-| Money | Integer minor units plus a currency code, never floats | Totals never drift, and currencies arrive in v0.3 without a migration |
-| Books | An append-only ledger of transactions. Each entry records the amount, the currency, the amount converted into the company's currency, and what it was for (job, vehicle, km) | The finance panel, statistics and milestones are all worked out from it, so every total has one source |
-| Time | 1 tick = 1 game minute on a real calendar. The engine raises day, week and month boundary events | Weekly wages and monthly loans plug in without touching the clock |
-| New game | A new game is built from a **scenario** definition: start town, date, cash, vehicles, seed and failure rule. v0.1 has one built-in scenario, Plymouth sandbox | Scenarios become data, not code |
-| Saves | Each save has a version number and a migration function per version, and stores the random-number generator's state | Already in the plan. Loading a save reproduces the game exactly |
+| Area                 | Decision                                                                                                                                                                     | Why now                                                                                                |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Depots               | The company has a **list** of depots, which contains one in v0.1                                                                                                             | v0.2 adds depots instead of rewriting everything that assumes one                                      |
+| Company headquarters | One depot is the headquarters, and it sets the company's currency                                                                                                            | Scenarios can start anywhere, and the currency follows                                                 |
+| Vehicle location     | A vehicle is either **at a place** (any town) or **travelling a leg** between two places                                                                                     | Vehicles staying where they finish needs this from v0.1                                                |
+| Vehicle home depot   | Every vehicle stores a `homeDepotId`                                                                                                                                         | Servicing, driver bases and per-depot fleets in v0.2                                                   |
+| Vehicle models       | A general model: transport mode (road, sea or air), capacity, speed, price, fuel use, maintenance, and the licence needed                                                    | Trucks, ships and planes are new data, not new code                                                    |
+| Trips                | A trip is a **list of legs**, each with a mode, start and end. In v0.1 a job has two road legs: empty to the pickup, then loaded to the destination                          | Ferries, tunnels and sea or air legs slot in later                                                     |
+| Places               | Every town carries a country code. Port and airport flags are added later                                                                                                    | Borders and currencies hang off the country                                                            |
+| Money                | Integer minor units plus a currency code, never floats                                                                                                                       | Totals never drift, and currencies arrive in v0.3 without a migration                                  |
+| Books                | An append-only ledger of transactions. Each entry records the amount, the currency, the amount converted into the company's currency, and what it was for (job, vehicle, km) | The finance panel, statistics and milestones are all worked out from it, so every total has one source |
+| Time                 | 1 tick = 1 game minute on a real calendar. The engine raises day, week and month boundary events                                                                             | Weekly wages and monthly loans plug in without touching the clock                                      |
+| New game             | A new game is built from a **scenario** definition: start town, date, cash, vehicles, seed and failure rule. v0.1 has one built-in scenario, Plymouth sandbox                | Scenarios become data, not code                                                                        |
+| Saves                | Each save has a version number and a migration function per version, and stores the random-number generator's state                                                          | Already in the plan. Loading a save reproduces the game exactly                                        |
 
 ## Systems
 
@@ -118,13 +118,13 @@ A row earns its place only if adding it later would mean rewriting code or break
 - **Urgency:** 25 % of jobs are Express and the rest Standard.
 - **Offer expiry:** 8 game hours, or sooner if a vehicle leaving the depot could no longer arrive on time.
 
-| Cargo | Weight range | Pay multiplier |
-| --- | --- | --- |
-| Parcels | 50–300 kg | ×1.00 |
-| Groceries | 100–600 kg | ×1.00 |
-| Furniture | 200–700 kg | ×1.15 |
-| Building supplies | 400–1,250 kg | ×0.95 |
-| Electronics | 100–400 kg | ×1.25 |
+| Cargo             | Weight range | Pay multiplier |
+| ----------------- | ------------ | -------------- |
+| Parcels           | 50–300 kg    | ×1.00          |
+| Groceries         | 100–600 kg   | ×1.00          |
+| Furniture         | 200–700 kg   | ×1.15          |
+| Building supplies | 400–1,250 kg | ×0.95          |
+| Electronics       | 100–400 kg   | ×1.25          |
 
 **Pay**
 
@@ -160,10 +160,10 @@ pay = (basePay + payPerKm × loadedKm)
 
 - **Decided:** vehicles stay where they finish, belong to a home depot, and v0.1 has two van models.
 
-| Model | Mode | Capacity | Speed | Price | Fuel | Maintenance | ≈ Cost per km |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Compact van | Road | 750 kg | 55 km/h | £3,500 | 7.5 L/100 km | 6p/km | 17p |
-| Panel van | Road | 1,300 kg | 52 km/h | £6,000 | 9.5 L/100 km | 8p/km | 22p |
+| Model       | Mode | Capacity | Speed   | Price  | Fuel         | Maintenance | ≈ Cost per km |
+| ----------- | ---- | -------- | ------- | ------ | ------------ | ----------- | ------------- |
+| Compact van | Road | 750 kg   | 55 km/h | £3,500 | 7.5 L/100 km | 6p/km       | 17p           |
+| Panel van   | Road | 1,300 kg | 52 km/h | £6,000 | 9.5 L/100 km | 8p/km       | 22p           |
 
 - A new sandbox game starts with one Compact van at Plymouth.
 - **Lifecycle:**
@@ -348,12 +348,12 @@ pay = (basePay + payPerKm × loadedKm)
 
 A Compact van drives 30 km empty to the pickup, then 40 km loaded, carrying 200 kg of Standard parcels.
 
-| Item | Working | Result |
-| --- | --- | --- |
-| Pay | (£20 + 40 × 80p) × 1.06 | £55 |
-| Running costs | 70 km × 16.9p | £11.81 |
-| Profit | | £43.19 |
-| Time | 70 km ÷ 55 km/h + 40 min | 1 h 56 m (48 s at 1×) |
+| Item          | Working                  | Result                |
+| ------------- | ------------------------ | --------------------- |
+| Pay           | (£20 + 40 × 80p) × 1.06  | £55                   |
+| Running costs | 70 km × 16.9p            | £11.81                |
+| Profit        |                          | £43.19                |
+| Time          | 70 km ÷ 55 km/h + 40 min | 1 h 56 m (48 s at 1×) |
 
 Compare a poor job: 60 km empty and 20 km loaded pays £38 for 2 h 7 m, which is about £12 an hour against about £22 for the job above.
 
@@ -365,35 +365,35 @@ Because the engine is pure and seeded, a headless bot could play many seeds and 
 
 ## Constants — v0.1 starting values
 
-| `balance.ts` name | Value | Unit |
-| --- | --- | --- |
-| `time.gameMinutesPerRealSecond` | 2.4 | game minutes per second at 1× |
-| `time.speedMultipliers` | 1, 2, 4 | × |
-| `world.jobRadiusKm` | 100 | km, straight line |
-| `world.minTownPopulation` | 5,000 | people |
-| `world.roadFactor` | 1.3 | × |
-| `jobs.maxOpenOffers` | 10 | offers |
-| `jobs.initialOffers` | 6 | offers |
-| `jobs.meanMinutesBetweenOffers` | 40 | game minutes |
-| `jobs.offerLifetimeMinutes` | 480 | game minutes |
-| `jobs.minLoadedKm` | 8 | km |
-| `jobs.expressChance` | 0.25 | probability |
-| `jobs.basePay` | 2,000 | minor units |
-| `jobs.payPerKm` | 80 | minor units per km |
-| `jobs.weightBonusPerTonne` | 0.3 | × per tonne |
-| `jobs.expressPayMultiplier` | 1.4 | × |
-| `jobs.standardSlack` | 2.0–3.0 | × |
-| `jobs.expressSlack` | 1.3–1.6 | × |
-| `jobs.referenceSpeedKmh` | 52 | km/h |
-| `jobs.latePenaltyPerHour` | 0.10 | fraction of pay |
-| `jobs.minLatePayFraction` | 0.40 | fraction of pay |
-| `handling.loadingMinutes` | 20 | game minutes |
-| `handling.unloadingMinutes` | 20 | game minutes |
-| `vehicles.compactVan` | 750 kg, 55 km/h, 350,000, 7.5 L/100 km, 6 per km | — |
-| `vehicles.panelVan` | 1,300 kg, 52 km/h, 600,000, 9.5 L/100 km, 8 per km | — |
-| `economy.dieselPerLitre` | 145 | minor units |
-| `economy.depotRentPerDay` | 4,000 | minor units |
-| `cargo.*` | see the cargo table | — |
+| `balance.ts` name               | Value                                              | Unit                          |
+| ------------------------------- | -------------------------------------------------- | ----------------------------- |
+| `time.gameMinutesPerRealSecond` | 2.4                                                | game minutes per second at 1× |
+| `time.speedMultipliers`         | 1, 2, 4                                            | ×                             |
+| `world.jobRadiusKm`             | 100                                                | km, straight line             |
+| `world.minTownPopulation`       | 5,000                                              | people                        |
+| `world.roadFactor`              | 1.3                                                | ×                             |
+| `jobs.maxOpenOffers`            | 10                                                 | offers                        |
+| `jobs.initialOffers`            | 6                                                  | offers                        |
+| `jobs.meanMinutesBetweenOffers` | 40                                                 | game minutes                  |
+| `jobs.offerLifetimeMinutes`     | 480                                                | game minutes                  |
+| `jobs.minLoadedKm`              | 8                                                  | km                            |
+| `jobs.expressChance`            | 0.25                                               | probability                   |
+| `jobs.basePay`                  | 2,000                                              | minor units                   |
+| `jobs.payPerKm`                 | 80                                                 | minor units per km            |
+| `jobs.weightBonusPerTonne`      | 0.3                                                | × per tonne                   |
+| `jobs.expressPayMultiplier`     | 1.4                                                | ×                             |
+| `jobs.standardSlack`            | 2.0–3.0                                            | ×                             |
+| `jobs.expressSlack`             | 1.3–1.6                                            | ×                             |
+| `jobs.referenceSpeedKmh`        | 52                                                 | km/h                          |
+| `jobs.latePenaltyPerHour`       | 0.10                                               | fraction of pay               |
+| `jobs.minLatePayFraction`       | 0.40                                               | fraction of pay               |
+| `handling.loadingMinutes`       | 20                                                 | game minutes                  |
+| `handling.unloadingMinutes`     | 20                                                 | game minutes                  |
+| `vehicles.compactVan`           | 750 kg, 55 km/h, 350,000, 7.5 L/100 km, 6 per km   | —                             |
+| `vehicles.panelVan`             | 1,300 kg, 52 km/h, 600,000, 9.5 L/100 km, 8 per km | —                             |
+| `economy.dieselPerLitre`        | 145                                                | minor units                   |
+| `economy.depotRentPerDay`       | 4,000                                              | minor units                   |
+| `cargo.*`                       | see the cargo table                                | —                             |
 
 All money values are in GBP minor units, because v0.1 is GBP only. Scenario values (start town, start date, cash and failure rule) live in the scenario definition, not in `balance.ts`.
 

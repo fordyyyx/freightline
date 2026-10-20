@@ -88,6 +88,23 @@ function handleSelectVan(id: string): void {
 }
 
 ## useEffect
+useEffects allow components to "do things" on rendering, such as using time intervals for a counter - or connecting to and disconnecting from a server on startup and closing. Effects run at the end of a commit after the screen updates not during rendering. The list of dependencies at the end stops it from firing after every render, [] means it fires only on mounting, [a,b] means it will only fire when either of a or b changed on that render.
+e.g.
+function GameClock() {
+    const [time, setTime] = useState(0);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => setTime((prev) => prev + 1), 1000);
+
+        return () => {
+            clearInterval(intervalId);
+        }
+    }, [])
+
+    return (
+        <h2>Minute: {time}</h2> 
+    )
+}
 
 ## Still unclear
 

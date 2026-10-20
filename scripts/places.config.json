@@ -1,0 +1,5 @@
+{
+    "centre": { "lat": 50.3755, "lon": -4.1427 },
+    "radiusKm": 100,
+    "minPopulation": 5000
+}

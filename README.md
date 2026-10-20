@@ -15,13 +15,13 @@ It is also a portfolio project, so engineering quality matters as much as the ga
 
 ## Scope of v0.1 "Local Courier"
 
-| In v0.1                                  | Later releases                     |
-| ---------------------------------------- | ---------------------------------- |
-| One home depot in Plymouth, vans only    | Depots in other cities             |
-| Local jobs within about 100 km           | Hiring drivers and paying wages    |
+| In v0.1                                     | Later releases                  |
+| ------------------------------------------- | ------------------------------- |
+| One home depot in Plymouth, vans only       | Depots in other cities          |
+| Local jobs within about 100 km              | Hiring drivers and paying wages |
 | Time controls, cash, fuel and running costs | Borders, ferries and currencies |
-| Save and load in the browser             | Sea and air freight                |
-| Free to play in the browser              | Desktop build                      |
+| Save and load in the browser                | Sea and air freight             |
+| Free to play in the browser                 | Desktop build                   |
 
 ## How it's built
 

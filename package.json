@@ -11,7 +11,8 @@
     "format": "prettier --write . ",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "react": "^19.3.1",
@@ -36,6 +37,5 @@
   },
   "engines": {
     "node": ">=24"
-  },
-  "typecheck": "tsc -b"
+  }
 }

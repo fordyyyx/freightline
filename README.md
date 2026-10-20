@@ -3,7 +3,7 @@
 A browser-based logistics tycoon: grow a one-van courier in Plymouth into a worldwide freight network, run entirely from a map and dashboard.
 
 > **Status:** in development, Sprint 0. The first playable release, v0.1 "Local Courier", is planned for December 2026.
-> **Play it:** live link coming soon.
+> **Play it:** [fordyyyx.github.io/freightline](https://fordyyyx.github.io/freightline/)
 
 _"Freightline" is a working title._
 

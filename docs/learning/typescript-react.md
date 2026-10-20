@@ -79,6 +79,13 @@ function Panel (props: PanelProps) {
 }
 
 ## useState
+useState allows components to "remember" variables so you can do things such as have selected items or keep track of a score etc. It takes an initial values and then you have a setXYZ function that takes the new value and updates it, storing it again to be used the next time it is called. The state is stored locally so even two identical components placed one after another work independently of one another. Calling the setter makes React re-render the component which is what allows for the update. The state value is fixed within each render, so calling setCount(count + 1) three times within one handle function will only update it once as each setCount call reads the same initial count value until the component is re-rendered. The initial value is only used once, on the very first render. Hooks must go at the top level of a component, not inside a nested function or a conditional loop.
+e.g.
+const [selectedId, setSelectedId] = useState<string | null>(null);
+
+function handleSelectVan(id: string): void {
+    setSelectedId(id);
+}
 
 ## useEffect
 

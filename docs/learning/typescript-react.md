@@ -107,5 +107,9 @@ function GameClock() {
 }
 
 ## Still unclear
+Props object still slightly unclear, making the same mistakes on it.
+useEffects and the engine loop, I have not done enough practice on due to time constraints.
+React with Leaflet I did not touch on at all.
 
 ## Time spent
+~6 hours

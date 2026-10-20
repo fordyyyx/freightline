@@ -96,7 +96,8 @@ A row earns its place only if adding it later would mean rewriting code or break
 
 **How it works**
 
-- **Places:** GeoNames towns in the UK within 100 km of the depot in a straight line, with a population of at least 5,000. Each place has an id, name, country code, coordinates and population.
+- **Places:** Wikidata towns in the UK within 100 km of the depot in a straight line, with a population of at least 5,000. Each place has an id (its Wikidata Q-number), name, country code, coordinates and population.
+- **Decided (20 Oct 2026):** places come from Wikidata, which is CC0, so no attribution is required; it is still listed in `CREDITS.md`. Q-numbers are permanent, which makes them good keys for saves.
 - The script that builds the places data takes the centre point and radius as settings, not values written into the code, so a different start town is a re-run rather than a code change.
 - **Distance:** great-circle distance (haversine) × a road factor of 1.3, always computed from coordinates.
 - **On the map**, vehicles move along the straight line between places.

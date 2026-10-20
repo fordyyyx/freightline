@@ -1,17 +1,17 @@
 # Freightline — Game Design
 
-Living document · last updated 14 Oct 2026
+Living document · last updated 20 Oct 2026
 
 ## How to use this document
 
 ### Planning horizons
 
-| Horizon        | Level of detail                              | Where it lives                 |
-| -------------- | -------------------------------------------- | ------------------------------ |
-| Current sprint | Acceptance criteria, estimates, dependencies | Issues in Sprint Backlog       |
-| Next sprint    | Rough issues, refined on the middle weekend  | Issues in Backlog              |
-| Rest of v0.1   | One-line stories                             | Sprint tables in the plan      |
-| v0.2 onwards   | Epics, mechanics, open questions and ideas   | Epic table, plus this document |
+| Horizon | Level of detail | Where it lives |
+| --- | --- | --- |
+| Current sprint | Acceptance criteria, estimates, dependencies | Issues in Sprint Backlog |
+| Next sprint | Rough issues, refined on the middle weekend | Issues in Backlog |
+| Rest of v0.1 | One-line stories | Sprint tables in the plan |
+| v0.2 onwards | Epics, mechanics, open questions and ideas | Epic table, plus this document |
 
 This document holds mechanics and ideas, not tickets. When a release becomes the next one, its ideas become issues at refinement.
 
@@ -30,41 +30,45 @@ This document holds mechanics and ideas, not tickets. When a release becomes the
 ### Numbers and units
 
 - From Sprint 1, `src/engine/balance.ts` is the source of truth for numbers. The constants table at the end gives each value's `balance.ts` name. Any PR that changes a number in code updates this file too.
-- The engine stores time as whole game minutes, distance in kilometres, and money as whole minor units (pence, cents) together with a currency code. Formatting for display is the UI's job.
+- The engine stores time as whole game minutes, distance in kilometres, and money as whole minor units (pence, cents) together with a currency code. Formatting for display happens only in the UI, through the single `Intl`-based helper that formats numbers, dates and money (see the plan's "Text and numbers"), so currency and locale changes happen in one place.
 
 ## Design direction (decided 14 Oct 2026)
 
-| Topic                 | Decision                                                                                                                                         |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Long-term goal        | Open-ended sandbox, with milestones to aim for and scenarios with set starts and targets                                                         |
-| Where vehicles end up | They stay where they finish a delivery; the next job starts from there                                                                           |
-| Vehicle ownership     | Every vehicle has a home depot                                                                                                                   |
-| Currency              | Real currencies. The company keeps its books in the currency of its home depot's country: GBP for a Plymouth start, with an override in settings |
-| Running out of money  | Each scenario sets its own rule. Sandbox: bankrupt after 14 days below zero                                                                      |
-| Pace                  | At 1×, a game day lasts about 10 real minutes                                                                                                    |
-| v0.1 vehicles         | Two van models                                                                                                                                   |
-| Drivers (v0.2)        | Named people with skill and experience, fatigue and hours, wages and morale, licences and specialities                                           |
+| Topic | Decision |
+| --- | --- |
+| Long-term goal | Open-ended sandbox, with milestones to aim for and scenarios with set starts and targets |
+| Starting location (decided 20 Oct 2026) | The player chooses their starting town anywhere in the world, and the network grows outward from there. v0.1 starts in Plymouth only |
+| Where vehicles end up | They stay where they finish a delivery; the next job starts from there |
+| Vehicle ownership | Every vehicle has a home depot |
+| Currency | Real currencies. The company keeps its books in the currency of its home depot's country: GBP for a Plymouth start, with an override in settings |
+| Running out of money | Each scenario sets its own rule. Sandbox: bankrupt after 14 days below zero |
+| Pace | At 1×, a game day lasts about 10 real minutes |
+| v0.1 vehicles | Two van models |
+| Drivers (v0.2) | Named people with skill and experience, fatigue and hours, wages and morale, licences and specialities |
 
 ## Data model decisions (made now to protect v0.2 onwards)
 
 These cost little in v0.1 but would be expensive to change once saves exist. The state shapes themselves belong in ARCHITECTURE.md; this table records the design reason for each.
 
+This table extends the plan's "Keeping a paid release possible" rules, which cover depots as a list, integer pence, the general vehicle type and the game-minute tick. The plan holds the reasons linked to a paid release, and this table holds the detail. If they disagree, update both in the same PR.
+
 A row earns its place only if adding it later would mean rewriting code or breaking saves. Anything that only adds a new field waits for its release, and a save migration handles it then.
 
-| Area                 | Decision                                                                                                                                                                     | Why now                                                                                                |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Depots               | The company has a **list** of depots, which contains one in v0.1                                                                                                             | v0.2 adds depots instead of rewriting everything that assumes one                                      |
-| Company headquarters | One depot is the headquarters, and it sets the company's currency                                                                                                            | Scenarios can start anywhere, and the currency follows                                                 |
-| Vehicle location     | A vehicle is either **at a place** (any town) or **travelling a leg** between two places                                                                                     | Vehicles staying where they finish needs this from v0.1                                                |
-| Vehicle home depot   | Every vehicle stores a `homeDepotId`                                                                                                                                         | Servicing, driver bases and per-depot fleets in v0.2                                                   |
-| Vehicle models       | A general model: transport mode (road, sea or air), capacity, speed, price, fuel use, maintenance, and the licence needed                                                    | Trucks, ships and planes are new data, not new code                                                    |
-| Trips                | A trip is a **list of legs**, each with a mode, start and end. In v0.1 a job has two road legs: empty to the pickup, then loaded to the destination                          | Ferries, tunnels and sea or air legs slot in later                                                     |
-| Places               | Every town carries a country code. Port and airport flags are added later                                                                                                    | Borders and currencies hang off the country                                                            |
-| Money                | Integer minor units plus a currency code, never floats                                                                                                                       | Totals never drift, and currencies arrive in v0.3 without a migration                                  |
-| Books                | An append-only ledger of transactions. Each entry records the amount, the currency, the amount converted into the company's currency, and what it was for (job, vehicle, km) | The finance panel, statistics and milestones are all worked out from it, so every total has one source |
-| Time                 | 1 tick = 1 game minute on a real calendar. The engine raises day, week and month boundary events                                                                             | Weekly wages and monthly loans plug in without touching the clock                                      |
-| New game             | A new game is built from a **scenario** definition: start town, date, cash, vehicles, seed and failure rule. v0.1 has one built-in scenario, Plymouth sandbox                | Scenarios become data, not code                                                                        |
-| Saves                | Each save has a version number and a migration function per version, and stores the random-number generator's state                                                          | Already in the plan. Loading a save reproduces the game exactly                                        |
+| Area | Decision | Why now |
+| --- | --- | --- |
+| Depots | The company has a **list** of depots, which contains one in v0.1 | v0.2 adds depots instead of rewriting everything that assumes one |
+| Company headquarters | One depot is the headquarters, and it sets the company's currency | Scenarios can start anywhere, and the currency follows |
+| Vehicle location | A vehicle is either **at a place** (any town) or **travelling a leg** between two places | Vehicles staying where they finish needs this from v0.1 |
+| Vehicle home depot | Every vehicle stores a `homeDepotId` | Servicing, driver bases and per-depot fleets in v0.2 |
+| Vehicle models | A general model: transport mode (road, sea or air), capacity, speed, price, fuel use, maintenance, and the licence needed | Trucks, ships and planes are new data, not new code |
+| Trips | A trip is a **list of legs**, each with a mode, start and end. In v0.1 a job has two road legs: empty to the pickup, then loaded to the destination | Ferries, tunnels and sea or air legs slot in later |
+| Places | Every town carries a country code. Port and airport flags are added later | Borders and currencies hang off the country |
+| Money | Integer minor units plus a currency code, never floats | Totals never drift, and currencies arrive in v0.3 without a migration |
+| Books | An append-only ledger of transactions. Each entry records the amount, the currency, the amount converted into the company's currency, and what it was for (job, vehicle, km) | The finance panel, statistics and milestones are all worked out from it, so every total has one source |
+| Time | 1 tick = 1 game minute on a real calendar. The engine raises day, week and month boundary events | Weekly wages and monthly loans plug in without touching the clock |
+| New game | A new game is built from a **scenario** definition: start town, date, cash, vehicles, seed and failure rule. v0.1 has one built-in scenario, Plymouth sandbox | Scenarios become data, not code |
+| Start town in code | Nothing hard-codes Plymouth. The start town, first depot and map centre always come from the scenario | A player-chosen start town later is new data, not a rewrite |
+| Saves | Each save has a version number and a migration function per version, and stores the random-number generator's state | Already in the plan. Loading a save reproduces the game exactly |
 
 ## Systems
 
@@ -93,6 +97,7 @@ A row earns its place only if adding it later would mean rewriting code or break
 **How it works**
 
 - **Places:** GeoNames towns in the UK within 100 km of the depot in a straight line, with a population of at least 5,000. Each place has an id, name, country code, coordinates and population.
+- The script that builds the places data takes the centre point and radius as settings, not values written into the code, so a different start town is a re-run rather than a code change.
 - **Distance:** great-circle distance (haversine) × a road factor of 1.3, always computed from coordinates.
 - **On the map**, vehicles move along the straight line between places.
 
@@ -118,13 +123,13 @@ A row earns its place only if adding it later would mean rewriting code or break
 - **Urgency:** 25 % of jobs are Express and the rest Standard.
 - **Offer expiry:** 8 game hours, or sooner if a vehicle leaving the depot could no longer arrive on time.
 
-| Cargo             | Weight range | Pay multiplier |
-| ----------------- | ------------ | -------------- |
-| Parcels           | 50–300 kg    | ×1.00          |
-| Groceries         | 100–600 kg   | ×1.00          |
-| Furniture         | 200–700 kg   | ×1.15          |
-| Building supplies | 400–1,250 kg | ×0.95          |
-| Electronics       | 100–400 kg   | ×1.25          |
+| Cargo | Weight range | Pay multiplier |
+| --- | --- | --- |
+| Parcels | 50–300 kg | ×1.00 |
+| Groceries | 100–600 kg | ×1.00 |
+| Furniture | 200–700 kg | ×1.15 |
+| Building supplies | 400–1,250 kg | ×0.95 |
+| Electronics | 100–400 kg | ×1.25 |
 
 **Pay**
 
@@ -160,12 +165,12 @@ pay = (basePay + payPerKm × loadedKm)
 
 - **Decided:** vehicles stay where they finish, belong to a home depot, and v0.1 has two van models.
 
-| Model       | Mode | Capacity | Speed   | Price  | Fuel         | Maintenance | ≈ Cost per km |
-| ----------- | ---- | -------- | ------- | ------ | ------------ | ----------- | ------------- |
-| Compact van | Road | 750 kg   | 55 km/h | £3,500 | 7.5 L/100 km | 6p/km       | 17p           |
-| Panel van   | Road | 1,300 kg | 52 km/h | £6,000 | 9.5 L/100 km | 8p/km       | 22p           |
+| Model | Mode | Capacity | Speed | Price | Fuel | Maintenance | ≈ Cost per km |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Compact van | Road | 750 kg | 55 km/h | £3,500 | 7.5 L/100 km | 6p/km | 17p |
+| Panel van | Road | 1,300 kg | 52 km/h | £6,000 | 9.5 L/100 km | 8p/km | 22p |
 
-- A new sandbox game starts with one Compact van at Plymouth.
+- A new sandbox game starts with one Compact van at the start town (Plymouth in v0.1).
 - **Lifecycle:**
   1. **Idle** at a town.
   2. **Collecting:** drives to the origin, then loads for 20 minutes.
@@ -251,7 +256,7 @@ pay = (basePay + payPerKm × loadedKm)
 - Experience levels, earned from km driven, that unlock better pay and lower incident risk.
 - Licence training as an investment: van → rigid truck → articulated lorry, plus hazardous goods and international work.
 - Drivers who prefer home runs and lose morale on long international trips.
-- Driver names generated with the seeded random-number generator, from a regional name list.
+- Driver names generated with the seeded random-number generator, from a regional name list. The list is third-party data, so it needs a licence that allows commercial use and an entry in `CREDITS.md`.
 
 ### 8. Progression — v0.2
 
@@ -269,6 +274,7 @@ pay = (basePay + payPerKm × loadedKm)
 **Ideas**
 
 - Example milestones: first second vehicle, 100 deliveries, first new depot, first international job, first container ship.
+- If the Steam gate says go, milestones could double as Steam achievements through `PlatformServices`. Working milestones out from the ledger makes that possible without engine changes.
 - Reputation that rises with on-time deliveries and unlocks better-paying clients.
 
 ### 9. Scenarios and failure — sandbox in v0.1, scenarios later
@@ -276,14 +282,16 @@ pay = (basePay + payPerKm × loadedKm)
 **How it works**
 
 - **Decided:** each scenario sets its own failure rule. Sandbox ends in bankruptcy after 14 days below zero.
+- **Decided (20 Oct 2026):** in sandbox, the player chooses their starting town anywhere in the world, and the network grows outward from that first depot. The start town also sets the company's currency through the headquarters depot. v0.1 offers Plymouth only; the choice arrives once worldwide town data exists, no earlier than the international release.
 - A scenario defines the start town, date, cash, vehicles, seed, failure rule and any targets.
-- v0.1 ships one scenario, Plymouth sandbox, built through this same structure.
+- v0.1 ships one scenario, Plymouth sandbox, built through this same structure. A player-chosen start is the same structure with the start town filled in by the player.
 - **Bankruptcy:** when cash goes below zero, a countdown appears in the top bar. Getting back above zero resets it. If the countdown reaches 14 days, the game ends with a summary screen.
 
 **Open questions**
 
 - Bankruptcy has no story in v0.1 yet. See "Knock-on changes to the plan" below.
-- Should the start town be selectable in sandbox, or only through scenarios?
+- How does the player pick a start town: by searching for a name, by clicking the map, or both?
+- Is every town a valid start, or only towns above a population threshold, so there are enough jobs nearby?
 
 **Ideas**
 
@@ -348,12 +356,12 @@ pay = (basePay + payPerKm × loadedKm)
 
 A Compact van drives 30 km empty to the pickup, then 40 km loaded, carrying 200 kg of Standard parcels.
 
-| Item          | Working                  | Result                |
-| ------------- | ------------------------ | --------------------- |
-| Pay           | (£20 + 40 × 80p) × 1.06  | £55                   |
-| Running costs | 70 km × 16.9p            | £11.81                |
-| Profit        |                          | £43.19                |
-| Time          | 70 km ÷ 55 km/h + 40 min | 1 h 56 m (48 s at 1×) |
+| Item | Working | Result |
+| --- | --- | --- |
+| Pay | (£20 + 40 × 80p) × 1.06 | £55 |
+| Running costs | 70 km × 16.9p | £11.81 |
+| Profit | | £43.19 |
+| Time | 70 km ÷ 55 km/h + 40 min | 1 h 56 m (48 s at 1×) |
 
 Compare a poor job: 60 km empty and 20 km loaded pays £38 for 2 h 7 m, which is about £12 an hour against about £22 for the job above.
 
@@ -365,35 +373,35 @@ Because the engine is pure and seeded, a headless bot could play many seeds and 
 
 ## Constants — v0.1 starting values
 
-| `balance.ts` name               | Value                                              | Unit                          |
-| ------------------------------- | -------------------------------------------------- | ----------------------------- |
-| `time.gameMinutesPerRealSecond` | 2.4                                                | game minutes per second at 1× |
-| `time.speedMultipliers`         | 1, 2, 4                                            | ×                             |
-| `world.jobRadiusKm`             | 100                                                | km, straight line             |
-| `world.minTownPopulation`       | 5,000                                              | people                        |
-| `world.roadFactor`              | 1.3                                                | ×                             |
-| `jobs.maxOpenOffers`            | 10                                                 | offers                        |
-| `jobs.initialOffers`            | 6                                                  | offers                        |
-| `jobs.meanMinutesBetweenOffers` | 40                                                 | game minutes                  |
-| `jobs.offerLifetimeMinutes`     | 480                                                | game minutes                  |
-| `jobs.minLoadedKm`              | 8                                                  | km                            |
-| `jobs.expressChance`            | 0.25                                               | probability                   |
-| `jobs.basePay`                  | 2,000                                              | minor units                   |
-| `jobs.payPerKm`                 | 80                                                 | minor units per km            |
-| `jobs.weightBonusPerTonne`      | 0.3                                                | × per tonne                   |
-| `jobs.expressPayMultiplier`     | 1.4                                                | ×                             |
-| `jobs.standardSlack`            | 2.0–3.0                                            | ×                             |
-| `jobs.expressSlack`             | 1.3–1.6                                            | ×                             |
-| `jobs.referenceSpeedKmh`        | 52                                                 | km/h                          |
-| `jobs.latePenaltyPerHour`       | 0.10                                               | fraction of pay               |
-| `jobs.minLatePayFraction`       | 0.40                                               | fraction of pay               |
-| `handling.loadingMinutes`       | 20                                                 | game minutes                  |
-| `handling.unloadingMinutes`     | 20                                                 | game minutes                  |
-| `vehicles.compactVan`           | 750 kg, 55 km/h, 350,000, 7.5 L/100 km, 6 per km   | —                             |
-| `vehicles.panelVan`             | 1,300 kg, 52 km/h, 600,000, 9.5 L/100 km, 8 per km | —                             |
-| `economy.dieselPerLitre`        | 145                                                | minor units                   |
-| `economy.depotRentPerDay`       | 4,000                                              | minor units                   |
-| `cargo.*`                       | see the cargo table                                | —                             |
+| `balance.ts` name | Value | Unit |
+| --- | --- | --- |
+| `time.gameMinutesPerRealSecond` | 2.4 | game minutes per second at 1× |
+| `time.speedMultipliers` | 1, 2, 4 | × |
+| `world.jobRadiusKm` | 100 | km, straight line |
+| `world.minTownPopulation` | 5,000 | people |
+| `world.roadFactor` | 1.3 | × |
+| `jobs.maxOpenOffers` | 10 | offers |
+| `jobs.initialOffers` | 6 | offers |
+| `jobs.meanMinutesBetweenOffers` | 40 | game minutes |
+| `jobs.offerLifetimeMinutes` | 480 | game minutes |
+| `jobs.minLoadedKm` | 8 | km |
+| `jobs.expressChance` | 0.25 | probability |
+| `jobs.basePay` | 2,000 | minor units |
+| `jobs.payPerKm` | 80 | minor units per km |
+| `jobs.weightBonusPerTonne` | 0.3 | × per tonne |
+| `jobs.expressPayMultiplier` | 1.4 | × |
+| `jobs.standardSlack` | 2.0–3.0 | × |
+| `jobs.expressSlack` | 1.3–1.6 | × |
+| `jobs.referenceSpeedKmh` | 52 | km/h |
+| `jobs.latePenaltyPerHour` | 0.10 | fraction of pay |
+| `jobs.minLatePayFraction` | 0.40 | fraction of pay |
+| `handling.loadingMinutes` | 20 | game minutes |
+| `handling.unloadingMinutes` | 20 | game minutes |
+| `vehicles.compactVan` | 750 kg, 55 km/h, 350,000, 7.5 L/100 km, 6 per km | — |
+| `vehicles.panelVan` | 1,300 kg, 52 km/h, 600,000, 9.5 L/100 km, 8 per km | — |
+| `economy.dieselPerLitre` | 145 | minor units |
+| `economy.depotRentPerDay` | 4,000 | minor units |
+| `cargo.*` | see the cargo table | — |
 
 All money values are in GBP minor units, because v0.1 is GBP only. Scenario values (start town, start date, cash and failure rule) live in the scenario definition, not in `balance.ts`.
 
@@ -408,3 +416,6 @@ These should be made at refinement, not in the middle of a sprint.
   - it replaces something of similar size in Sprint 3, or
   - v0.1 tracks days below zero and shows the warning, and the game-over screen moves to v0.2.
 - **New-game setup has no story.** The company name in the S1-5 top bar and the Plymouth sandbox scenario both need one. Candidate story: a new-game screen with a company name field, using the scenario structure.
+- **Choosing a start town (decided 20 Oct 2026):** add a backlog story outside v0.1: "As a player, I want to choose my starting town anywhere in the world, so that I can grow my network from a place I know." It depends on worldwide town data, so it belongs with the international or global releases. Until then, the new-game screen offers Plymouth only.
+- **S0-6 (#6):** the places script should take the centre and radius as settings, so another start town is a re-run. Add this to #6's acceptance criteria before it starts.
+- **S1-3 (#10):** the map centre comes from the scenario's start town, not hard-coded Plymouth coordinates. The S0-5 spike (#5) can still centre on Plymouth directly, because it is throwaway learning code.

@@ -1,0 +1,530 @@
+[
+  {
+    "id": "Q43382",
+    "name": "Plymouth",
+    "countryCode": "GB",
+    "lat": 50.371388888,
+    "lon": -4.142222222,
+    "population": 267918
+  },
+  {
+    "id": "Q134672",
+    "name": "Exeter",
+    "countryCode": "GB",
+    "lat": 50.725555555,
+    "lon": -3.526944444,
+    "population": 124180
+  },
+  {
+    "id": "Q776662",
+    "name": "Paignton",
+    "countryCode": "GB",
+    "lat": 50.435277777,
+    "lon": -3.5625,
+    "population": 64410
+  },
+  {
+    "id": "Q209055",
+    "name": "Torquay",
+    "countryCode": "GB",
+    "lat": 50.4625,
+    "lon": -3.528055555,
+    "population": 48563
+  },
+  {
+    "id": "Q1007093",
+    "name": "Exmouth",
+    "countryCode": "GB",
+    "lat": 50.62,
+    "lon": -3.413,
+    "population": 35499
+  },
+  {
+    "id": "Q660484",
+    "name": "Newton Abbot",
+    "countryCode": "GB",
+    "lat": 50.5403,
+    "lon": -3.6087,
+    "population": 27092
+  },
+  {
+    "id": "Q808532",
+    "name": "Barnstaple",
+    "countryCode": "GB",
+    "lat": 51.0823,
+    "lon": -4.0489,
+    "population": 24094
+  },
+  {
+    "id": "Q478029",
+    "name": "Falmouth",
+    "countryCode": "GB",
+    "lat": 50.15,
+    "lon": -5.066666666,
+    "population": 24032
+  },
+  {
+    "id": "Q1774403",
+    "name": "Camborne",
+    "countryCode": "GB",
+    "lat": 50.213,
+    "lon": -5.3,
+    "population": 23831
+  },
+  {
+    "id": "Q943517",
+    "name": "Newquay",
+    "countryCode": "GB",
+    "lat": 50.412,
+    "lon": -5.0757,
+    "population": 23626
+  },
+  {
+    "id": "Q637298",
+    "name": "Tiverton",
+    "countryCode": "GB",
+    "lat": 50.903,
+    "lon": -3.488,
+    "population": 22291
+  },
+  {
+    "id": "Q180803",
+    "name": "Truro",
+    "countryCode": "GB",
+    "lat": 50.26,
+    "lon": -5.051,
+    "population": 21046
+  },
+  {
+    "id": "Q772614",
+    "name": "St Austell",
+    "countryCode": "GB",
+    "lat": 50.338,
+    "lon": -4.795,
+    "population": 20985
+  },
+  {
+    "id": "Q1234840",
+    "name": "Bideford",
+    "countryCode": "GB",
+    "lat": 51.0162,
+    "lon": -4.2171,
+    "population": 18196
+  },
+  {
+    "id": "Q889888",
+    "name": "Bodmin",
+    "countryCode": "GB",
+    "lat": 50.466,
+    "lon": -4.718,
+    "population": 16909
+  },
+  {
+    "id": "Q921326",
+    "name": "Brixham",
+    "countryCode": "GB",
+    "lat": 50.3849,
+    "lon": -3.5205,
+    "population": 16831
+  },
+  {
+    "id": "Q1026685",
+    "name": "Wellington",
+    "countryCode": "GB",
+    "lat": 50.9755,
+    "lon": -3.2243,
+    "population": 16678
+  },
+  {
+    "id": "Q1994597",
+    "name": "Saltash",
+    "countryCode": "GB",
+    "lat": 50.408,
+    "lon": -4.212,
+    "population": 16288
+  },
+  {
+    "id": "Q1010210",
+    "name": "Redruth",
+    "countryCode": "GB",
+    "lat": 50.233,
+    "lon": -5.224,
+    "population": 15626
+  },
+  {
+    "id": "Q1248368",
+    "name": "Dawlish",
+    "countryCode": "GB",
+    "lat": 50.581,
+    "lon": -3.466,
+    "population": 15264
+  },
+  {
+    "id": "Q531311",
+    "name": "Teignmouth",
+    "countryCode": "GB",
+    "lat": 50.5491,
+    "lon": -3.4948,
+    "population": 14933
+  },
+  {
+    "id": "Q995647",
+    "name": "Sidmouth",
+    "countryCode": "GB",
+    "lat": 50.68,
+    "lon": -3.239,
+    "population": 14377
+  },
+  {
+    "id": "Q2424368",
+    "name": "Fremington",
+    "countryCode": "GB",
+    "lat": 51.07,
+    "lon": -4.11,
+    "population": 12784
+  },
+  {
+    "id": "Q668262",
+    "name": "Tavistock",
+    "countryCode": "GB",
+    "lat": 50.55003,
+    "lon": -4.14424,
+    "population": 12677
+  },
+  {
+    "id": "Q1235872",
+    "name": "Northam",
+    "countryCode": "GB",
+    "lat": 51.0393,
+    "lon": -4.2104,
+    "population": 12330
+  },
+  {
+    "id": "Q1215945",
+    "name": "Kingsteignton",
+    "countryCode": "GB",
+    "lat": 50.5458,
+    "lon": -3.5962,
+    "population": 12048
+  },
+  {
+    "id": "Q1018121",
+    "name": "Ivybridge",
+    "countryCode": "GB",
+    "lat": 50.389,
+    "lon": -3.921,
+    "population": 11904
+  },
+  {
+    "id": "Q1012535",
+    "name": "Helston",
+    "countryCode": "GB",
+    "lat": 50.1,
+    "lon": -5.27,
+    "population": 11611
+  },
+  {
+    "id": "Q647123",
+    "name": "Honiton",
+    "countryCode": "GB",
+    "lat": 50.8,
+    "lon": -3.19,
+    "population": 11334
+  },
+  {
+    "id": "Q1018429",
+    "name": "Ilfracombe",
+    "countryCode": "GB",
+    "lat": 51.208,
+    "lon": -4.12,
+    "population": 11035
+  },
+  {
+    "id": "Q2019908",
+    "name": "Liskeard",
+    "countryCode": "GB",
+    "lat": 50.4536,
+    "lon": -4.4651,
+    "population": 10902
+  },
+  {
+    "id": "Q724182",
+    "name": "St Ives",
+    "countryCode": "GB",
+    "lat": 50.21,
+    "lon": -5.48,
+    "population": 10748
+  },
+  {
+    "id": "Q5139618",
+    "name": "Cockington",
+    "countryCode": "GB",
+    "lat": 50.463333333,
+    "lon": -3.556388888,
+    "population": 10636
+  },
+  {
+    "id": "Q668275",
+    "name": "Cullompton",
+    "countryCode": "GB",
+    "lat": 50.855,
+    "lon": -3.393,
+    "population": 10492
+  },
+  {
+    "id": "Q287590",
+    "name": "Launceston",
+    "countryCode": "GB",
+    "lat": 50.635,
+    "lon": -4.354,
+    "population": 10247
+  },
+  {
+    "id": "Q1010221",
+    "name": "Hayle",
+    "countryCode": "GB",
+    "lat": 50.183,
+    "lon": -5.416,
+    "population": 9772
+  },
+  {
+    "id": "Q984974",
+    "name": "Bude",
+    "countryCode": "GB",
+    "lat": 50.824,
+    "lon": -4.542,
+    "population": 9222
+  },
+  {
+    "id": "Q1025776",
+    "name": "St Agnes",
+    "countryCode": "GB",
+    "lat": 50.312,
+    "lon": -5.204,
+    "population": 8591
+  },
+  {
+    "id": "Q1025788",
+    "name": "Penryn",
+    "countryCode": "GB",
+    "lat": 50.169,
+    "lon": -5.107,
+    "population": 8489
+  },
+  {
+    "id": "Q1007106",
+    "name": "Totnes",
+    "countryCode": "GB",
+    "lat": 50.43216,
+    "lon": -3.68391,
+    "population": 8241
+  },
+  {
+    "id": "Q1226021",
+    "name": "Braunton",
+    "countryCode": "GB",
+    "lat": 51.11,
+    "lon": -4.162,
+    "population": 8203
+  },
+  {
+    "id": "Q1139440",
+    "name": "Crediton",
+    "countryCode": "GB",
+    "lat": 50.7924,
+    "lon": -3.6514,
+    "population": 8152
+  },
+  {
+    "id": "Q792596",
+    "name": "Axminster",
+    "countryCode": "GB",
+    "lat": 50.783333,
+    "lon": -3,
+    "population": 8125
+  },
+  {
+    "id": "Q895361",
+    "name": "Bovey Tracey",
+    "countryCode": "GB",
+    "lat": 50.593,
+    "lon": -3.672,
+    "population": 7998
+  },
+  {
+    "id": "Q1247828",
+    "name": "Ottery St Mary",
+    "countryCode": "GB",
+    "lat": 50.752,
+    "lon": -3.279,
+    "population": 7894
+  },
+  {
+    "id": "Q1235885",
+    "name": "Seaton",
+    "countryCode": "GB",
+    "lat": 50.705,
+    "lon": -3.078,
+    "population": 7688
+  },
+  {
+    "id": "Q2146886",
+    "name": "St Stephen-in-Brannel",
+    "countryCode": "GB",
+    "lat": 50.344,
+    "lon": -4.891,
+    "population": 7558
+  },
+  {
+    "id": "Q2041269",
+    "name": "Torpoint",
+    "countryCode": "GB",
+    "lat": 50.376,
+    "lon": -4.205,
+    "population": 7444
+  },
+  {
+    "id": "Q1234883",
+    "name": "Okehampton",
+    "countryCode": "GB",
+    "lat": 50.7388,
+    "lon": -4.0041,
+    "population": 7309
+  },
+  {
+    "id": "Q2618791",
+    "name": "St Blazey",
+    "countryCode": "GB",
+    "lat": 50.3611,
+    "lon": -4.7162,
+    "population": 7254
+  },
+  {
+    "id": "Q5583592",
+    "name": "Goodrington",
+    "countryCode": "GB",
+    "lat": 50.4219,
+    "lon": -3.5625,
+    "population": 6910
+  },
+  {
+    "id": "Q261619",
+    "name": "Wadebridge",
+    "countryCode": "GB",
+    "lat": 50.518,
+    "lon": -4.885,
+    "population": 6811
+  },
+  {
+    "id": "Q744317",
+    "name": "Calstock",
+    "countryCode": "GB",
+    "lat": 50.497,
+    "lon": -4.21,
+    "population": 6648
+  },
+  {
+    "id": "Q3696493",
+    "name": "Cranbrook",
+    "countryCode": "GB",
+    "lat": 50.751472222,
+    "lon": -3.401638888,
+    "population": 6553
+  },
+  {
+    "id": "Q7195881",
+    "name": "Pinhoe",
+    "countryCode": "GB",
+    "lat": 50.74069,
+    "lon": -3.46717,
+    "population": 6454
+  },
+  {
+    "id": "Q2364410",
+    "name": "Perranzabuloe",
+    "countryCode": "GB",
+    "lat": 50.326,
+    "lon": -5.133,
+    "population": 6402
+  },
+  {
+    "id": "Q1247777",
+    "name": "South Molton",
+    "countryCode": "GB",
+    "lat": 51.02,
+    "lon": -3.83,
+    "population": 6276
+  },
+  {
+    "id": "Q2045500",
+    "name": "Callington",
+    "countryCode": "GB",
+    "lat": 50.503,
+    "lon": -4.316,
+    "population": 5983
+  },
+  {
+    "id": "Q1242349",
+    "name": "Great Torrington",
+    "countryCode": "GB",
+    "lat": 50.953,
+    "lon": -4.141,
+    "population": 5801
+  },
+  {
+    "id": "Q774099",
+    "name": "Kingsbridge",
+    "countryCode": "GB",
+    "lat": 50.2833,
+    "lon": -3.7765,
+    "population": 5681
+  },
+  {
+    "id": "Q681695",
+    "name": "Illogan",
+    "countryCode": "GB",
+    "lat": 50.25,
+    "lon": -5.268,
+    "population": 5544
+  },
+  {
+    "id": "Q1024896",
+    "name": "Looe",
+    "countryCode": "GB",
+    "lat": 50.3535,
+    "lon": -4.454,
+    "population": 5311
+  },
+  {
+    "id": "Q1007083",
+    "name": "Dartmouth",
+    "countryCode": "GB",
+    "lat": 50.350277777,
+    "lon": -3.578611111,
+    "population": 5260
+  },
+  {
+    "id": "Q1001536",
+    "name": "Budleigh Salterton",
+    "countryCode": "GB",
+    "lat": 50.628411111,
+    "lon": -3.320469444,
+    "population": 5235
+  },
+  {
+    "id": "Q1868076",
+    "name": "Kingskerswell",
+    "countryCode": "GB",
+    "lat": 50.496,
+    "lon": -3.5722,
+    "population": 5071
+  },
+  {
+    "id": "Q7593036",
+    "name": "St Enoder",
+    "countryCode": "GB",
+    "lat": 50.374,
+    "lon": -4.965,
+    "population": 5025
+  }
+]

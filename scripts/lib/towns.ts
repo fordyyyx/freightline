@@ -1,3 +1,5 @@
+import { type PlacesConfig } from "./config.ts";
+
 const QID_PATTERN = /^Q\d+$/;
 
 export function qidFromUri(url: string): string {
@@ -152,4 +154,27 @@ export function buildTowns(
   towns.sort((a, b) => b.population - a.population);
 
   return { towns, missingPopulation };
+}
+
+export function buildQuery(config: PlacesConfig): string {
+  return `
+    SELECT DISTINCT ?place ?placeLabel ?location ?countryCode ?population ?popDate WHERE {
+        SERVICE wikibase:around {
+            ?place wdt:P625 ?location .
+            bd:serviceParam wikibase:center "Point(${config.centre.lon} ${config.centre.lat})"^^geo:wktLiteral .
+            bd:serviceParam wikibase:radius "${config.radiusKm}" .
+        }
+        VALUES ?allowedType { wd:Q515 wd:Q3957 wd:Q532 }
+        ?place wdt:P31/wdt:P279* ?allowedType .
+        FILTER NOT EXISTS { ?place wdt:P31 wd:Q188509 }
+        OPTIONAL { ?place wdt:P17/wdt:P297 ?countryCode . }
+        OPTIONAL {
+            ?place p:P1082 ?popStatement .
+            ?popStatement ps:P1082 ?population .
+            FILTER NOT EXISTS { ?popStatement wikibase:rank wikibase:DeprecatedRank }
+            OPTIONAL { ?popStatement pq:P585 ?popDate . }
+        }
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en-gb,en" . }
+        }
+    `;
 }

@@ -5,6 +5,7 @@ import {
   type PopulationFigure,
   type WikidataRow,
   buildTowns,
+  buildQuery,
 } from "../../../scripts/lib/towns.ts";
 import { describe, it, expect } from "vitest";
 
@@ -387,5 +388,29 @@ describe("buildTowns", () => {
     expect(towns[1]?.population).toBe(7000);
     expect(towns[2]?.population).toBe(6000);
     expect(missingPopulation).toEqual([]);
+  });
+});
+
+describe("buildQuery", () => {
+  it("puts the centre in the query longitude first", () => {
+    const query = buildQuery({
+      centre: { lat: 50.3755, lon: -4.1427 },
+      radiusKm: 100,
+      minPopulation: 5000,
+    });
+
+    expect(query).toContain("Point(-4.1427 50.3755)");
+    expect(query).toContain('radius "100"');
+  });
+
+  it("uses the centre and radius from the settings", () => {
+    const query = buildQuery({
+      centre: { lat: 48.3905, lon: -4.4861 },
+      radiusKm: 50,
+      minPopulation: 5000,
+    });
+
+    expect(query).toContain("Point(-4.4861 48.3905)");
+    expect(query).toContain('radius "50"');
   });
 });

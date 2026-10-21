@@ -3,7 +3,12 @@ import {
   type BoundingBox,
   boundingBox,
 } from "../../../scripts/lib/map.ts";
-import type { Feature, FeatureCollection, Polygon } from "geojson";
+import type {
+  Feature,
+  FeatureCollection,
+  Polygon,
+  MultiPolygon,
+} from "geojson";
 import { describe, it, expect } from "vitest";
 
 describe("boundingBox", () => {
@@ -113,6 +118,16 @@ function collection(
   return { type: "FeatureCollection", features };
 }
 
+function twoSquares(): Feature<MultiPolygon> {
+  const inside = square(2, 2, 4, 4).geometry.coordinates;
+  const outside = square(20, 20, 21, 21).geometry.coordinates;
+  return {
+    type: "Feature",
+    properties: {},
+    geometry: { type: "MultiPolygon", coordinates: [inside, outside] },
+  };
+}
+
 describe("clipAndSimplify", () => {
   it("keeps a shape inside the box", () => {
     const input = collection(square(2, 2, 4, 4));
@@ -153,5 +168,20 @@ describe("clipAndSimplify", () => {
     const result = clipAndSimplify(input, BOX, TOLERANCE);
 
     expect(result.features[0]?.properties).toEqual({});
+  });
+
+  it("removes empty parts left by clipping a multipolygon", () => {
+    const input: FeatureCollection<MultiPolygon> = {
+      type: "FeatureCollection",
+      features: [twoSquares()],
+    };
+
+    const result = clipAndSimplify(input, BOX, TOLERANCE);
+
+    const geometry = result.features[0]?.geometry;
+    if (geometry?.type !== "MultiPolygon") {
+      throw new Error("Expected a multipolygon");
+    }
+    expect(geometry.coordinates).toHaveLength(1);
   });
 });

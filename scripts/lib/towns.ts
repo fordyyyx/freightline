@@ -65,3 +65,91 @@ export function latestPopulation(pops: PopulationFigure[]): number | undefined {
   }
   return pop;
 }
+
+export interface WikidataValue {
+  value: string;
+}
+
+export interface WikidataRow {
+  place: WikidataValue;
+  placeLabel: WikidataValue;
+  location: WikidataValue;
+  countryCode?: WikidataValue;
+  population?: WikidataValue;
+  popDate?: WikidataValue;
+}
+
+export interface Town {
+  id: string;
+  name: string;
+  countryCode: string;
+  lat: number;
+  lon: number;
+  population: number;
+}
+
+export function buildTowns(
+  rows: WikidataRow[],
+  minPopulation: number,
+): { towns: Town[]; missingPopulation: string[] } {
+  const groups = new Map<string, WikidataRow[]>();
+  const missingPopulation: string[] = [];
+  const towns: Town[] = [];
+
+  for (const row of rows) {
+    const qnum = qidFromUri(row.place.value);
+    let group = groups.get(qnum);
+    if (group === undefined) {
+      group = [];
+      groups.set(qnum, group);
+    }
+    group.push(row);
+  }
+  for (const [qid, placeRows] of groups) {
+    const first = placeRows[0];
+    if (first === undefined) {
+      throw new Error(`Empty group for ${qid}`);
+    }
+    const label = first.placeLabel.value;
+    const location = first.location.value;
+    const countryCode = first.countryCode?.value;
+
+    const figures: PopulationFigure[] = [];
+    for (const row of placeRows) {
+      const population = row.population?.value;
+      if (population !== undefined) {
+        const value = Number(population);
+        if (Number.isNaN(value)) {
+          continue;
+        }
+        figures.push({
+          population: Number(population),
+          date: row.popDate?.value,
+        });
+      }
+    }
+    const pop = latestPopulation(figures);
+    if (pop === undefined) {
+      missingPopulation.push(`${label} (${qid})`);
+    } else if (pop >= minPopulation) {
+      if (countryCode === undefined) {
+        throw new Error(`No country code for ${label} (${qid})`);
+      }
+      if (QID_PATTERN.test(label)) {
+        throw new Error(`Place has no name (${qid})`);
+      }
+      const { lat, lon } = parsePoint(location);
+      towns.push({
+        id: qid,
+        name: label,
+        countryCode,
+        lat,
+        lon,
+        population: pop,
+      });
+    }
+  }
+  towns.sort((a, b) => b.population - a.population);
+
+  return { towns, missingPopulation };
+}

@@ -23,6 +23,23 @@ function isEmpty(geometry: Geometry): boolean {
   return geometry.coordinates.flat(Infinity).length === 0;
 }
 
+function removeEmptyParts(geometry: Geometry): Geometry | undefined {
+  switch (geometry.type) {
+    case "MultiPolygon": {
+      const parts = geometry.coordinates.filter(
+        (part) => part.flat(Infinity).length > 0,
+      );
+      return parts.length > 0 ? { ...geometry, coordinates: parts } : undefined;
+    }
+    case "MultiLineString": {
+      const parts = geometry.coordinates.filter((part) => part.length > 0);
+      return parts.length > 0 ? { ...geometry, coordinates: parts } : undefined;
+    }
+    default:
+      return isEmpty(geometry) ? undefined : geometry;
+  }
+}
+
 export function clipAndSimplify(
   collection: FeatureCollection<ClippableGeometry>,
   box: BoundingBox,
@@ -32,14 +49,15 @@ export function clipAndSimplify(
 
   for (const feature of collection.features) {
     const clipped = bboxClip(feature, box);
-    if (isEmpty(clipped.geometry)) {
+    const geometry = removeEmptyParts(clipped.geometry);
+    if (geometry == undefined) {
       continue;
     }
-    const simplified = simplify(clipped, { tolerance, highQuality: false });
+    const simplified = simplify(geometry, { tolerance, highQuality: false });
     features.push({
       type: "Feature",
       properties: {},
-      geometry: simplified.geometry,
+      geometry: simplified,
     });
   }
 

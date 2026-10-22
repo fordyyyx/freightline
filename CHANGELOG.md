@@ -6,4 +6,4 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ### Added
 
-- A map of Plymouth and the surrounded coast.
+- A map of Plymouth and the surrounding coast.

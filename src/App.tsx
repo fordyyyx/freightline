@@ -1,7 +1,12 @@
 import "./App.css";
+import MapView from "./ui/MapView.tsx";
 
 function App() {
-  return <></>;
+  return (
+    <div>
+      <MapView />
+    </div>
+  );
 }
 
 export default App;

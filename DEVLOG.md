@@ -2,6 +2,18 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-10-21 - Town and map data, and a map data bug
+
+- **Done:** Finished #6: a Wikidata script writes 66 towns (estimate was 30-60; threshold kept at 5,000) and a Natural Earth script writes land and coastline clipped to the play area, both driven by one settings file and unit-tested (5 h against 2 points). Found that clipped land shapes contained hundres of empty polygons, which is invalid GeoJSON; raised #24 with the new Bug template, fixed it with a regression test and regenerated the data (#25). Added #24 (1 point) mid-sprint, so the sprint total is now 15. The 1:10m coastline is smoothed and sits a little inland around estuaries such as the Tamar; recorded for checking before #10.
+- **Next:** #5, the Leaflet map spike, the last item in Sprint 0.
+- **Blocked:** Nothing.
+
+## 2026-10-20 - Skeleton, templates, and CI
+
+- **Done:** Finished the #2 spike: notes on TypeScript and React in docs/learning, practice project outside the repo (6 h against the 6-hour time-box). #3: Vite, React, and TypeScript skeleton with ESLint, Prettier, Vitest, and the src folder structure. #4: Story, Task, Spike, and Bug issue templates and a README with vision and scope. Decided the player can start anywhere in the world (Plymouth only in v0.1) and that town data comes from Wikidata; recorded both in GAME_DESIGN.md. #1: CI runs lint, format, type-check, and tests on every PR, merges deploy to GitHub Pages, and the game is live at fordyyyx.github.io/freightline. Removed the Vite starter icons and added the live link to the README (#22). Started #6.
+- **Next:** Finish #6, the town and map data.
+- **Blocked:** Nothing.
+
 ## 2026-10-19 - Licence decision
 
 - **Done:** Changed licence to all rights reserved from MIT so the code cannot be sold or used by others - allowing recruiters to still view the code but protecting a future paid release.

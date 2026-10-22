@@ -27,7 +27,10 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            { group: ["react", "react-*", "react/*"], message: "The engine must not import React." },
+            {
+              group: ["react", "react-*", "react/*"],
+              message: "The engine must not import React.",
+            },
           ],
         },
       ],

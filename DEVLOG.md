@@ -2,6 +2,12 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-10-22 - Sprint goal met, refinement and #9 pulled in
+
+- **Done:** Finished #5: a Leaflet map of the play area is live at fordyyyx.github.io/freightline, using Leaflet directly because react-leaflet is under the Hippocratic License (2 h against 2 points). That meets the Sprint 0 goal, with all 15 planned points done. Refined Sprint 1 (#8-#12): acceptance criteria, estimates (15 points) and blocked-by relationships, and moved all five to Ready. Pulled #9 into Sprint 0 and finished it: lint now stops React and browser globals reaching `src/engine/`, a seeded random number generator (mulberry32, pinned by a known-values test), and an immutable game state advanced in whole ticks (2 h against 3 points).
+- **Next:** Sprint 0 review and retrospective on Sunday 1 November; capture the backlog items from this sprint (start-anywhere town story, coastline check, pre-commit hook idea).
+- **Blocked:** Nothing.
+
 ## 2026-10-21 - Town and map data, and a map data bug
 
 - **Done:** Finished #6: a Wikidata script writes 66 towns (estimate was 30-60; threshold kept at 5,000) and a Natural Earth script writes land and coastline clipped to the play area, both driven by one settings file and unit-tested (5 h against 2 points). Found that clipped land shapes contained hundres of empty polygons, which is invalid GeoJSON; raised #24 with the new Bug template, fixed it with a regression test and regenerated the data (#25). Added #24 (1 point) mid-sprint, so the sprint total is now 15. The 1:10m coastline is smoothed and sits a little inland around estuaries such as the Tamar; recorded for checking before #10.

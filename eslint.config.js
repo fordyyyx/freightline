@@ -17,7 +17,23 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      globals: globals.browser,
+      globals: globals.node,
+    },
+  },
+  {
+    files: ["src/engine/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["react", "react-*", "react/*"],
+              message: "The engine must not import React.",
+            },
+          ],
+        },
+      ],
     },
   },
   eslintConfigPrettier,

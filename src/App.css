@@ -1,0 +1,7 @@
+.map {
+  height: 100vh;
+}
+
+.map.leaflet-container {
+  background: #a9cfe8;
+}

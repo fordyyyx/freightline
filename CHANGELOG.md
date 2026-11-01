@@ -4,6 +4,8 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ## [Unreleased]
 
+- The land map is now filled in light green.
+
 ### Added
 
 - A map of Plymouth and the surrounding coast.

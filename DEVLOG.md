@@ -2,6 +2,12 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-11-01 - Fixed missing # bug, added in map pan gif and sprint 0 retro
+
+- **Done:** Fixed bug with land-fill colour missing #. Added in the map-pan gif displaying the map at the live URL. Wrote sprint 0 retro tying in all the work from this sprint
+- **Next:** Sprint 1 planning
+- **Blocked:** Nothing.
+
 ## 2026-10-22 - Sprint goal met, refinement and #9 pulled in
 
 - **Done:** Finished #5: a Leaflet map of the play area is live at fordyyyx.github.io/freightline, using Leaflet directly because react-leaflet is under the Hippocratic License (2 h against 2 points). That meets the Sprint 0 goal, with all 15 planned points done. Refined Sprint 1 (#8-#12): acceptance criteria, estimates (15 points) and blocked-by relationships, and moved all five to Ready. Pulled #9 into Sprint 0 and finished it: lint now stops React and browser globals reaching `src/engine/`, a seeded random number generator (mulberry32, pinned by a known-values test), and an immutable game state advanced in whole ticks (2 h against 3 points).

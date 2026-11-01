@@ -24,7 +24,7 @@ export default function MapView() {
       style: {
         color: "#5b7d4a",
         weight: 1,
-        fillColor: "d9e8c3",
+        fillColor: "#d9e8c3",
         fillOpacity: 1,
       },
     }).addTo(map);

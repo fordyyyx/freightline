@@ -16,14 +16,17 @@
 ## Keep
 
 <!-- What worked and should carry on. -->
+
 Lots of concentrated work so ideas flow without lots of interruptions.
 
 ## Stop
 
 <!-- What cost time or caused problems. -->
+
 Finishing too early leaves a big gap with not much to do as pulling issues into earlier sprints could create too much work down the line.
 
 ## Try
 
 <!-- One to three specific changes for Sprint 1, each something you could check at the next retro. -->
+
 Splitting issues up a little bit more as the sprint was finished a few days into it.

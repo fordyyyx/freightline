@@ -43,4 +43,8 @@ describe("ticksForFrame", () => {
   it("does not tick when the game is hidden for more than the maximum frame length", () => {
     expect(runFrames(300000, 1, 1)).toBe(0);
   });
+
+  it("does not tick for negative frame lengths", () => {
+    expect(runFrames(-5, 300, 1)).toBe(0);
+  });
 });

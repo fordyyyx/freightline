@@ -1,6 +1,6 @@
 import { balance } from "./balance.ts";
 
-const EARTH_RADIUS_KM = 6371.009;
+export const EARTH_RADIUS_KM = 6371.009; // IUGG mean Earth radius
 
 export interface Coordinates {
   lat: number;

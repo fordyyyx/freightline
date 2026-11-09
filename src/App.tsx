@@ -1,13 +1,13 @@
 import "./App.css";
 import MapView from "./ui/MapView.tsx";
 import TopBar from "./ui/TopBar.tsx";
-import towns from "./data/towns.json";
-import { plymouthSandbox } from "./engine/scenarios.ts";
-import { createGame, currentCalendarMinutes } from "./engine/state.ts";
-
-const game = createGame(plymouthSandbox, towns);
+import { currentCalendarMinutes } from "./engine/state.ts";
+import { useGameLoop } from "./ui/useGameLoop.ts";
+import { useGameStore } from "./ui/store.ts";
 
 function App() {
+  useGameLoop();
+  const game = useGameStore((store) => store.game);
   return (
     <div className="app">
       <TopBar

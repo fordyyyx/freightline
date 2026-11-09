@@ -7,7 +7,7 @@ import towns from "../data/towns.json";
 
 export interface GameStore {
   game: GameState;
-  speed: number;
+  speed: Speed;
   setSpeed: (speed: Speed) => void;
   tick: (ticks: number) => void;
 }

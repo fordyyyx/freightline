@@ -2,6 +2,8 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
+## 2026-11-09 - Late Sprint 1 planning, #11 done
+
 ## 2026-11-01 - Fixed missing # bug, added in map pan gif and sprint 0 retro
 
 - **Done:** Fixed bug with land-fill colour missing #. Added in the map-pan gif displaying the map at the live URL. Wrote sprint 0 retro tying in all the work from this sprint

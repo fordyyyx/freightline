@@ -57,3 +57,7 @@ export function advance(state: GameState, ticks: number): GameState {
   }
   return { ...state, minutes: state.minutes + ticks };
 }
+
+export function currentCalendarMinutes(state: GameState): number {
+  return state.startTime + state.minutes;
+}

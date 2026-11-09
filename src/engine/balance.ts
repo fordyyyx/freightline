@@ -1,5 +1,5 @@
 export const balance = {
-    world: {
-        roadFactor: 1.3,
-    },
+  world: {
+    roadFactor: 1.3,
+  },
 } as const;

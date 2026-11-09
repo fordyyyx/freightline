@@ -34,6 +34,36 @@ export default defineConfig([
           ],
         },
       ],
+      "no-restricted-globals": [
+        "error",
+        { name: "window", message: "The engine must not use browser APIs." },
+        { name: "document", message: "The engine must not use browser APIs." },
+        {
+          name: "localStorage",
+          message: "Save through SaveStore in src/platform/.",
+        },
+        { name: "performance", message: "Use the game clock, not real time." },
+      ],
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "Math",
+          property: "random",
+          message: "Use the seeded generator in random.ts.",
+        },
+        {
+          object: "Date",
+          property: "now",
+          message: "Use the game clock, not real time.",
+        },
+      ],
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: "Use the game clock, not real time.",
+        },
+      ],
     },
   },
   eslintConfigPrettier,

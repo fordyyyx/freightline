@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { advance, createGame } from "../../src/engine/state.ts";
+import {
+  advance,
+  createGame,
+  currentCalendarMinutes,
+} from "../../src/engine/state.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
@@ -131,5 +135,22 @@ describe("advance", () => {
     const tickNinety = advance(newGame, 90);
 
     expect(tickNinety).toEqual(tickSixtyAfter);
+  });
+});
+
+describe("currentCalendarMinutes", () => {
+  it("returns startTime for a new game", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(currentCalendarMinutes(newGame)).toEqual(newGame.startTime);
+  });
+
+  it("returns the correct time after advancing a new game", () => {
+    const newGame = createGame(testScenario, towns);
+    const advancedGame = advance(newGame, 1440);
+
+    expect(currentCalendarMinutes(advancedGame)).toEqual(
+      newGame.startTime + 1440,
+    );
   });
 });

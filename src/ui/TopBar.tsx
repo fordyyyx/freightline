@@ -1,5 +1,6 @@
 import type { Money } from "../engine/money.ts";
 import { formatGameDate, formatMoney } from "./format.ts";
+import SpeedControls from "./SpeedControls.tsx";
 
 interface TopBarProps {
   companyName: string;
@@ -14,6 +15,7 @@ export default function TopBar({
 }: TopBarProps) {
   return (
     <header className="top-bar">
+      <SpeedControls />
       <span className="top-bar__company">{companyName}</span>
       <div className="top-bar__status">
         <span>{formatGameDate(calendarMinutes)}</span>

@@ -1,12 +1,54 @@
 import { seedRandom } from "./random.ts";
+import type { Money } from "./money.ts";
+import type { Town } from "./world.ts";
+import type { Scenario } from "./scenarios.ts";
+import { greatCircleKm } from "./distance.ts";
+import { balance } from "./balance.ts";
+
+export interface Depot {
+  readonly id: string;
+  readonly townId: string;
+}
+
+export interface Company {
+  readonly name: string;
+  readonly cash: Money;
+  readonly depots: readonly Depot[];
+}
 
 export interface GameState {
   readonly minutes: number;
   readonly rngState: number;
+  readonly startTime: number;
+  readonly company: Company;
+  readonly towns: readonly Town[];
 }
 
-export function createGameState(seed: number): GameState {
-  return { minutes: 0, rngState: seedRandom(seed) };
+export function createGame(
+  scenario: Scenario,
+  towns: readonly Town[],
+): GameState {
+  const startTown = towns.find((town) => town.id === scenario.startTownId);
+  if (!startTown) {
+    throw new Error(`Start town not found: ${scenario.startTownId}`);
+  }
+  const townsInRange = towns.filter(
+    (town) => greatCircleKm(startTown, town) <= balance.world.jobRadiusKm,
+  );
+
+  const startingDepot = { id: "depot-1", townId: startTown.id };
+  const startingCompany = {
+    name: scenario.companyName,
+    cash: scenario.startingCash,
+    depots: [startingDepot],
+  };
+  return {
+    minutes: 0,
+    rngState: seedRandom(scenario.seed),
+    startTime: scenario.startTime,
+    company: startingCompany,
+    towns: townsInRange,
+  };
 }
 
 export function advance(state: GameState, ticks: number): GameState {

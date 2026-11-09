@@ -2,7 +2,11 @@
 
 One entry per working session, newest first: what got done, what's next, anything blocking.
 
-## 2026-11-09 - Late Sprint 1 planning, #11 done
+## 2026-11-09 - Sprint 1 planned late; #11, #39, #12, and #8 done
+
+- **Done:** Planned Sprint 1 a week late: nothing was merged between the Sprint 0 retro and today. Refinement found two gaps: no issue built the scenario or engine world state that #10 and #12 rely on, and lint only blocked React imports in `src/engine/`, not `Date.now()`, `Math.random()` or browser globals as the 22 October entry said. Added #38 (2) and #39 (1), bringing the sprint to 15 points. #11: great-circle and road distance with `balance.ts`; an extra test from (0, 0) to (0, 90) caught the sine terms being squared in the wrong place, which the Plymouth and London tests couldn't detect at short range (#36, follow-up #37). #39: lint rules for engine determinism, with a Vitest test that lints sample code (#40). #38: scenario definition, Plymouth sandbox, calendar minutes on a UTC calendar, and `createGame` with company, depot list, and towns within the job radius (#41). #8 engin half: `ticksForFrame` converts real frame time into whole ticks; the 2x and 30 fps tests came out one minute short from floating-point error, fixed with a small tolerance (#42). #12 top bar with company name, cash, and date through shared `Intl` helpers; the UTC calendar means the 28 March clock change doesn't skip an hour; switched the game font to Nunito (OFL), recorded in CREDITS.md (#43). #8 UI half: Zustand game store, a fram loop with `requestAnimationFrame`, and pause, 1x, 2x, and 4x controls in the top bar; new games start paused.
+- **Next:** #10, depot and town markers on the map, read from engine state and centred on the scenario's start town. If any town lands in the sea, settle the coastline question (#29) first.
+- **Blocked:** Nothing.
 
 ## 2026-11-01 - Fixed missing # bug, added in map pan gif and sprint 0 retro
 

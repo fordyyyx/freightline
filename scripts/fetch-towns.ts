@@ -1,6 +1,14 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parseConfig } from "./lib/config.ts";
 import { buildQuery, buildTowns, type WikidataRow } from "./lib/towns.ts";
+import { snapToLand } from "./lib/coast.ts";
+import type {
+  FeatureCollection,
+  Polygon,
+  MultiPolygon,
+  LineString,
+  MultiLineString,
+} from "geojson";
 
 const CONFIG_PATH = "scripts/places.config.json";
 const OUTPUT_PATH = "src/data/towns.json";
@@ -34,8 +42,33 @@ const { towns, missingPopulation } = buildTowns(
   data.results.bindings,
   config.minPopulation,
 );
-await writeFile(OUTPUT_PATH, JSON.stringify(towns, null, 2) + "\n");
 
+const land = JSON.parse(
+  await readFile("src/data/land.geojson", "utf8"),
+) as FeatureCollection<Polygon | MultiPolygon>;
+
+const coast = JSON.parse(
+  await readFile("src/data/coastline.geojson", "utf8"),
+) as FeatureCollection<LineString | MultiLineString>;
+
+const snappedTowns = towns.map((town) => ({
+  ...town,
+  ...snapToLand(town, land, coast, {
+    marginKm: config.coastMarginKm,
+    maxSnapKm: config.maxSnapKm,
+  }),
+}));
+
+const moved = snappedTowns.filter(
+  (town, i) => town.lat !== towns[i].lat || town.lon !== towns[i].lon,
+);
+
+await writeFile(OUTPUT_PATH, JSON.stringify(snappedTowns, null, 2) + "\n");
+
+console.log(`Moved ${moved.length} towns onto land:`);
+for (const town of moved) {
+  console.log(`  ${town.name}`);
+}
 console.log(`Wrote ${towns.length} towns to ${OUTPUT_PATH}`);
 console.log(`Places with no population (${missingPopulation.length}):`);
 for (const place of missingPopulation) {

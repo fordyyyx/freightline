@@ -1,5 +1,5 @@
 import type { Coordinates } from "./distance.ts";
-import type { Depot, GameState } from "./state.ts";
+import type { GameState } from "./state.ts";
 
 export interface Town extends Coordinates {
   readonly id: string;
@@ -17,8 +17,7 @@ export function findTown(towns: readonly Town[], id: string): Town {
 }
 
 export function depotTowns(state: GameState): readonly Town[] {
-  const towns = state.company.depots.map((depot: Depot) =>
+  return state.company.depots.map((depot) =>
     findTown(state.towns, depot.townId),
   );
-  return towns;
 }

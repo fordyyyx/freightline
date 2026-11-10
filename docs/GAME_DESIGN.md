@@ -101,6 +101,7 @@ A row earns its place only if adding it later would mean rewriting code or break
 - The script that builds the places data takes the centre point and radius as settings, not values written into the code, so a different start town is a re-run rather than a code change.
 - **Distance:** great-circle distance (haversine) × a road factor of 1.3, always computed from coordinates.
 - **On the map**, vehicles move along the straight line between places.
+  \-**Coastline accuracy (spike #29, 10 Nov 2026)** The natural earth 1:10m coastline is smoothed but the right shape around the Tamar, Plym, Exe, and Fal, so a finer source isn't needed for v0.1. Five towns fell in the sea (Exmouth, Saltash, Dawlish, Seaton, and Budleigh Salterton), Saltash visibly even when zoomed out. The towns script moves any town outside the land shape to the nearest coastline point plus a small inland margin, failing if that means moving more than 2km (#46). A test checks that every town in `towns.json` is on land.
 
 **Open questions**
 

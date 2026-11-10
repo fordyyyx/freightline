@@ -397,6 +397,8 @@ describe("buildQuery", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     });
 
     expect(query).toContain("Point(-4.1427 50.3755)");
@@ -408,6 +410,8 @@ describe("buildQuery", () => {
       centre: { lat: 48.3905, lon: -4.4861 },
       radiusKm: 50,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     });
 
     expect(query).toContain("Point(-4.4861 48.3905)");

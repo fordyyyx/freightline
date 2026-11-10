@@ -4,9 +4,11 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ## [Unreleased]
 
-- A top bar now shows the name of the company, the date, and cash.
-
 ### Added
+
+- Markers for your depot and nearby towns on the map, with town names on hover.
+
+- A top bar now shows the name of the company, the date, and cash.
 
 - The land map is now filled in light green.
 

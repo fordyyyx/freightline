@@ -58,7 +58,7 @@ describe("createGame", () => {
   it("throws for a missing start town", () => {
     expect(() =>
       createGame({ ...plymouthSandbox, startTownId: "missing" }, towns),
-    ).toThrow("Start town not found");
+    ).toThrow("Town not found");
   });
 
   it("produces identical games for identical scenarios", () => {

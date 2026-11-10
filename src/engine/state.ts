@@ -1,6 +1,7 @@
 import { seedRandom } from "./random.ts";
 import type { Money } from "./money.ts";
 import type { Town } from "./world.ts";
+import { findTown } from "./world.ts";
 import type { Scenario } from "./scenarios.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
@@ -28,10 +29,7 @@ export function createGame(
   scenario: Scenario,
   towns: readonly Town[],
 ): GameState {
-  const startTown = towns.find((town) => town.id === scenario.startTownId);
-  if (!startTown) {
-    throw new Error(`Start town not found: ${scenario.startTownId}`);
-  }
+  const startTown = findTown(towns, scenario.startTownId);
   const townsInRange = towns.filter(
     (town) => greatCircleKm(startTown, town) <= balance.world.jobRadiusKm,
   );

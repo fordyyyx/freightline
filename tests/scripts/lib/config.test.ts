@@ -7,6 +7,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     };
 
     const config = parseConfig(input);
@@ -15,6 +17,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     });
   });
 
@@ -23,6 +27,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
       colour: "blue",
     };
 
@@ -32,6 +38,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     });
   });
 
@@ -128,6 +136,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 0,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     };
 
     const config = parseConfig(input);
@@ -136,6 +146,8 @@ describe("parseConfig", () => {
       centre: { lat: 50.3755, lon: -4.1427 },
       radiusKm: 100,
       minPopulation: 0,
+      coastMarginKm: 0.3,
+      maxSnapKm: 2,
     });
   });
 
@@ -156,6 +168,60 @@ describe("parseConfig", () => {
 
     expect(() => parseConfig(input)).toThrow(
       "minPopulation must be a number of 0 or more",
+    );
+  });
+
+  it("throws for a missing coastMarginKm", () => {
+    const input = {
+      centre: { lat: 50.3755, lon: -4.1427 },
+      radiusKm: 100,
+      minPopulation: 5000,
+      maxSnapKm: 2,
+    };
+
+    expect(() => parseConfig(input)).toThrow(
+      "coastMarginKm must be a number greater than 0",
+    );
+  });
+
+  it("throws for a 0 or less coastMarginKm", () => {
+    const input = {
+      centre: { lat: 50.3755, lon: -4.1427 },
+      radiusKm: 100,
+      minPopulation: 5000,
+      coastMarginKm: -2,
+      maxSnapKm: 2,
+    };
+
+    expect(() => parseConfig(input)).toThrow(
+      "coastMarginKm must be a number greater than 0",
+    );
+  });
+
+  it("throws for a missing maxSnapKm", () => {
+    const input = {
+      centre: { lat: 50.3755, lon: -4.1427 },
+      radiusKm: 100,
+      minPopulation: 5000,
+      coastMarginKm: 0.3,
+    };
+
+    expect(() => parseConfig(input)).toThrow(
+      "maxSnapKm must be a number greater than 0",
+    );
+  });
+
+  it("throws for a maxSnapKm of 0 or less", () => {
+    const input = {
+      centre: { lat: 50.3755, lon: -4.1427 },
+      radiusKm: 100,
+      minPopulation: 5000,
+      coastMarginKm: 0.3,
+      maxSnapKm: -2,
+    };
+
+    expect(() => parseConfig(input)).toThrow(
+      "maxSnapKm must be a number greater than 0",
     );
   });
 });

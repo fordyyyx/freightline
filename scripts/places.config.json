@@ -1,5 +1,7 @@
 {
   "centre": { "lat": 50.3755, "lon": -4.1427 },
   "radiusKm": 100,
-  "minPopulation": 5000
+  "minPopulation": 5000,
+  "coastMarginKm": 0.3,
+  "maxSnapKm": 2
 }

@@ -4,6 +4,8 @@ export interface PlacesConfig {
   centre: Coordinates;
   radiusKm: number;
   minPopulation: number;
+  coastMarginKm: number;
+  maxSnapKm: number;
 }
 
 function isNumber(x: unknown): x is number {
@@ -38,5 +40,21 @@ export function parseConfig(value: unknown): PlacesConfig {
     throw new Error("minPopulation must be a number of 0 or more");
   }
 
-  return { centre: { lat, lon }, radiusKm, minPopulation };
+  const coastMarginKm = config.coastMarginKm;
+  if (!isNumber(coastMarginKm) || coastMarginKm <= 0) {
+    throw new Error("coastMarginKm must be a number greater than 0");
+  }
+
+  const maxSnapKm = config.maxSnapKm;
+  if (!isNumber(maxSnapKm) || maxSnapKm <= 0) {
+    throw new Error("maxSnapKm must be a number greater than 0");
+  }
+
+  return {
+    centre: { lat, lon },
+    radiusKm,
+    minPopulation,
+    coastMarginKm,
+    maxSnapKm,
+  };
 }

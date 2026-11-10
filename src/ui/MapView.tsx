@@ -19,8 +19,9 @@ export default function MapView() {
       return;
     }
 
-    const { game } = useGameStore.getState();
-    const [home] = depotTowns(game);
+    const { game } = useGameStore.getState(); // state is only read once as v0.1 does not add depots mid game
+    const depots = depotTowns(game);
+    const [home] = depots;
 
     const map = L.map(container, {
       center: [home.lat, home.lon],
@@ -55,7 +56,7 @@ export default function MapView() {
         .addTo(map);
     }
 
-    for (const town of depotTowns(game)) {
+    for (const town of depots) {
       L.circleMarker([town.lat, town.lon], {
         radius: 8,
         color: "#2b2b2b",

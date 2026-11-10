@@ -29,6 +29,8 @@ It is also a portfolio project, so engineering quality matters as much as the ga
 - **The simulation engine** (`src/engine/`) is pure TypeScript with no React or DOM code, and is unit-tested with Vitest.
 - **The UI** (`src/ui/`) only reads snapshots from the engine and sends it commands.
 
+The layers, state shape and design decisions are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## How it's run
 
 Solo Scrum in two-week sprints, tracked on the [project board](https://github.com/users/fordyyyx/projects/1). Progress is logged in [DEVLOG.md](DEVLOG.md), and retrospectives are in [docs/retros](docs/retros).

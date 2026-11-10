@@ -15,7 +15,7 @@ const query = buildQuery(config);
 const params = new URLSearchParams({ query, format: "json" });
 const response = await fetch(`${ENDPOINT}?${params}`, {
   headers: {
-    Accept: "applications/sparql-results+json",
+    Accept: "application/sparql-results+json",
     "User-Agent": USER_AGENT,
   },
 });

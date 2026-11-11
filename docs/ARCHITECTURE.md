@@ -73,7 +73,7 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 
 ### State shape
 
-As of Sprint 1:
+As of Sprint 2:
 
 ```ts
 interface GameState {
@@ -88,11 +88,20 @@ interface Company {
   readonly name: string;
   readonly cash: Money; // { amount: whole minor units, currency: "GBP" }
   readonly depots: readonly Depot[]; // one in v0.1, but always a list
+  readonly vehicles: readonly Vehicle[]; // one in v0.1, but always a list
 }
 
 interface Depot {
   readonly id: string;
   readonly townId: string; // a Wikidata Q-number
+}
+
+interface Vehicle {
+  readonly id: string;
+  readonly modelId: VehicleModelId;
+  readonly homeDepotId: string;
+  readonly townId: string;
+  readonly status: VehicleStatus;
 }
 ```
 
@@ -100,7 +109,6 @@ Planned additions, each from a Ready issue:
 
 | Field                                 | Issue    | Notes                                                                                                   |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `company.vehicles`                    | #49      | Each with a model id, `homeDepotId`, current town and status                                            |
 | Job board offers and a job id counter | #51, #52 | Ids come from a counter, not randomness, so equal inputs give equal games                               |
 | Trips as a list of legs               | #55      | Stage end times stored when a job is accepted; status and position are worked out from the current time |
 | Ledger                                | #57      | Append-only; cash changes only through entries                                                          |

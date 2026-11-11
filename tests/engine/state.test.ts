@@ -23,6 +23,11 @@ const far: Town = { ...home, id: "T3", name: "Far", lat: 51.5 };
 const towns = [home, near, far];
 const testScenario: Scenario = { ...plymouthSandbox, startTownId: "T1" };
 
+const twoVehicleScenario: Scenario = {
+  ...testScenario,
+  startingVehicles: ["compactVan", "panelVan"],
+};
+
 describe("createGame", () => {
   it("produces the correct company from the scenario", () => {
     const newGame = createGame(testScenario, towns);
@@ -66,6 +71,29 @@ describe("createGame", () => {
     const newGameTwo = createGame(testScenario, towns);
 
     expect(newGameOne).toEqual(newGameTwo);
+  });
+
+  it("starts a game with exactly one vehicle", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.company.vehicles).toHaveLength(1);
+  });
+
+  it("starts a game with the correct vehicle", () => {
+    const newGame = createGame(testScenario, towns);
+    const vehicle = newGame.company.vehicles[0];
+
+    expect(vehicle.id).toBe("vehicle-1");
+    expect(vehicle.modelId).toBe("compactVan");
+    expect(vehicle.homeDepotId).toBe("depot-1");
+    expect(vehicle.status).toBe("idle");
+  });
+
+  it("gives multiple starting vehicles different ids", () => {
+    const newGame = createGame(twoVehicleScenario, towns);
+    const [vehicleOne, vehicleTwo] = newGame.company.vehicles;
+
+    expect(vehicleOne === vehicleTwo).toBe(false);
   });
 });
 

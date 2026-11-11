@@ -6,10 +6,14 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ### Added
 
+- Pause and speed controls now appear in the top bar.
+
 - Markers for your depot and nearby towns on the map, with town names on hover.
 
 - A top bar now shows the name of the company, the date, and cash.
 
-- The land map is now filled in light green.
-
 - A map of Plymouth and the surrounding coast.
+
+### Fixed
+
+- The land map is now filled in light green.

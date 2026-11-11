@@ -2,7 +2,7 @@
 
 **Dates:** 2 - 15 November 2026 (work finished on 10 November)
 **Sprint goal:** Time passes and the local world exists
-**Goal met:** Yes
+**Goal met:** Yes - also split issues up more as the sprint 0 retro suggested, merging 2 PRs for #8 and splitting S2-1 and S2-4 in sprint 2 planning
 
 ## Numbers
 

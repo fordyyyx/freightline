@@ -25,4 +25,8 @@ describe("plymouthSandbox", () => {
   it("contains an integer seed", () => {
     expect(Number.isInteger(plymouthSandbox.seed)).toBe(true);
   });
+
+  it("contains the correct starting van", () => {
+    expect(plymouthSandbox.startingVehicles).toEqual(["compactVan"]);
+  });
 });

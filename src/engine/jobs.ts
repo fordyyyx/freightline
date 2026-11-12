@@ -20,18 +20,18 @@ export function jobPay(input: JobPayInput): number {
 
   const cargoMultiplier = balance.cargo[input.cargo].payMultiplier;
   const urgencyMultiplier =
-    input.urgency == "express" ? balance.jobs.expressPayMultiplier : 1.0;
+    input.urgency === "express" ? balance.jobs.expressPayMultiplier : 1.0;
   const weightBonus =
     1 + (balance.jobs.weightBonusPerTonne * input.weightKg) / 1000;
 
-  const jobPay = Math.round(
+  const pounds = Math.round(
     ((basePay + payPerKm * loadedKm) *
       cargoMultiplier *
       urgencyMultiplier *
       weightBonus) /
       100,
   );
-  return jobPay * 100;
+  return pounds * 100;
 }
 
 export function estimatedJobMinutes(

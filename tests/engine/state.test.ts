@@ -4,7 +4,6 @@ import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
-import { seedRandom } from "../../src/engine/random.ts";
 
 const home: Town = {
   id: "T1",
@@ -54,7 +53,6 @@ describe("createGame", () => {
 
     expect(newGame.startTime).toEqual(testScenario.startTime);
     expect(newGame.minutes).toBe(0);
-    expect(newGame.rngState).toEqual(seedRandom(testScenario.seed));
   });
 
   it("throws for a missing start town", () => {
@@ -96,7 +94,20 @@ describe("createGame", () => {
   it("gives the correct starting job id", () => {
     const newGame = createGame(testScenario, towns);
 
-    expect(newGame.nextJobId).toBe(1);
+    expect(newGame.nextJobId).toBe(7);
+  });
+
+  it("draws its randomness from the scenario's seed", () => {
+    const gameA = createGame({ ...testScenario, seed: 1 }, towns);
+    const gameB = createGame({ ...testScenario, seed: 2 }, towns);
+
+    expect(gameA.board).not.toEqual(gameB.board);
+  });
+
+  it("generates 6 jobs for a new game", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.board).toHaveLength(6);
   });
 });
 
@@ -127,8 +138,7 @@ describe("advance", () => {
     const tickSixty = advance(newGame, 60);
 
     expect(tickSixty.minutes).toBe(60);
-    expect(newGame.minutes).toBe(0);
-    expect(newGame.rngState).toBe(seedRandom(testScenario.seed));
+    expect(newGame).toEqual(createGame(testScenario, towns));
   });
 
   it("produces equal results when advancing equal games", () => {
@@ -166,6 +176,67 @@ describe("advance", () => {
     const tickNinety = advance(newGame, 90);
 
     expect(tickNinety).toEqual(tickSixtyAfter);
+  });
+
+  it("removes offers on the correct tick", () => {
+    const newGame = createGame(testScenario, towns);
+    const earliestExpiry = Math.min(
+      ...newGame.board.map((offer) => offer.expiresAt),
+    );
+    const earliest = newGame.board.find(
+      (offer) => offer.expiresAt === earliestExpiry,
+    );
+
+    const laterIds = newGame.board
+      .filter((offer) => offer.expiresAt > earliestExpiry)
+      .map((offer) => offer.id);
+
+    const ticksToExpiry = earliestExpiry - currentCalendarMinutes(newGame);
+    const justBefore = advance(newGame, ticksToExpiry - 1);
+    expect(justBefore.board.map((offer) => offer.id)).toContain(earliest?.id);
+
+    const atExpiry = advance(newGame, ticksToExpiry);
+    expect(atExpiry.board.map((offer) => offer.id)).not.toContain(earliest?.id);
+
+    const remainingIds = atExpiry.board.map((offer) => offer.id);
+    expect(remainingIds).toEqual(expect.arrayContaining(laterIds));
+  });
+
+  it("never has more than 10 offers on the board", () => {
+    const newGame = createGame(testScenario, towns);
+    let current = newGame;
+
+    for (let i = 0; i < 10000; i += 100) {
+      current = advance(current, 100);
+      expect(current.board.length).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("reaches 10 offers at some point", () => {
+    const newGame = createGame(testScenario, towns);
+    let current = newGame;
+    let maximumOffers = 0;
+
+    for (let i = 0; i < 10000; i += 100) {
+      current = advance(current, 100);
+      if (current.board.length > maximumOffers) {
+        maximumOffers = current.board.length;
+      }
+    }
+    expect(maximumOffers).toBe(10);
+  });
+
+  it("produces the same game for 1000 ticks at once and for 1000 single ticks", () => {
+    const newGameOne = createGame(testScenario, towns);
+    let newGameTwo = createGame(testScenario, towns);
+
+    const advanced1000 = advance(newGameOne, 1000);
+
+    for (let i = 0; i < 1000; i++) {
+      newGameTwo = advance(newGameTwo, 1);
+    }
+
+    expect(advanced1000).toEqual(newGameTwo);
   });
 });
 

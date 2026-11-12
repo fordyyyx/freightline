@@ -6,6 +6,8 @@ import type { Scenario } from "./scenarios.ts";
 import type { Vehicle } from "./vehicles.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
+import type { JobOffer } from "./jobs.ts";
+import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 
 export interface Depot {
   readonly id: string;
@@ -26,6 +28,7 @@ export interface GameState {
   readonly company: Company;
   readonly towns: readonly Town[];
   readonly nextJobId: number;
+  readonly board: readonly JobOffer[];
 }
 
 export function createGame(
@@ -53,19 +56,31 @@ export function createGame(
     depots: [startingDepot],
     vehicles: startingVehicles,
   };
-  return {
+  const newGame = {
     minutes: 0,
     rngState: seedRandom(scenario.seed),
     startTime: scenario.startTime,
     company: startingCompany,
     towns: townsInRange,
     nextJobId: 1,
+    board: [],
   };
+  return fillBoard(newGame, balance.jobs.initialOffers);
+}
+
+function advanceOneMinute(state: GameState): GameState {
+  const ticked = { ...state, minutes: state.minutes + 1 };
+  const offersRemoved = removeExpiredOffers(ticked);
+  return arriveOffers(offersRemoved);
 }
 
 export function advance(state: GameState, ticks: number): GameState {
   if (!Number.isInteger(ticks) || ticks < 0) {
     throw new Error(`ticks must be a whole number of 0 or more: ${ticks}`);
   }
-  return { ...state, minutes: state.minutes + ticks };
+  let current = state;
+  for (let i = 0; i < ticks; i++) {
+    current = advanceOneMinute(current);
+  }
+  return current;
 }

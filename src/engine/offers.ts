@@ -111,8 +111,7 @@ export function generateOffer(state: GameState): GeneratedOffer {
 export function fillBoard(state: GameState, count: number): GameState {
   let current = state;
   for (let i = 0; i < count; i++) {
-    const result = generateOffer(current);
-    current = { ...result.state, board: [...result.state.board, result.offer] };
+    current = addNewOffer(current);
   }
   return current;
 }
@@ -121,4 +120,29 @@ export function removeExpiredOffers(state: GameState): GameState {
   const now = currentCalendarMinutes(state);
   const board = state.board.filter((offer) => offer.expiresAt > now);
   return { ...state, board };
+}
+
+export function addNewOffer(state: GameState): GameState {
+  const result = generateOffer(state);
+  return { ...result.state, board: [...result.state.board, result.offer] };
+}
+
+export function offerArrives(rng: number): { arrives: boolean; state: number } {
+  const result = nextRandom(rng);
+  if (result.value < 1 / balance.jobs.meanMinutesBetweenOffers) {
+    return { arrives: true, state: result.state };
+  }
+  return { arrives: false, state: result.state };
+}
+
+export function arriveOffers(state: GameState): GameState {
+  if (state.board.length === balance.jobs.maxOpenOffers) {
+    return state;
+  }
+  const roll = offerArrives(state.rngState);
+
+  if (roll.arrives) {
+    return addNewOffer({ ...state, rngState: roll.state });
+  }
+  return { ...state, rngState: roll.state };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateOffer } from "../../src/engine/offers.ts";
+import { generateOffer, offerArrives } from "../../src/engine/offers.ts";
 import towns from "../../src/data/towns.json";
 import { balance } from "../../src/engine/balance.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
@@ -11,6 +11,7 @@ import type { GameState } from "../../src/engine/state.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import { estimatedJobMinutes, type JobOffer } from "../../src/engine/jobs";
+import { seedRandom } from "../../src/engine/random.ts";
 
 function generateMany(state: GameState, count: number): GeneratedOffer[] {
   const offers: GeneratedOffer[] = [];
@@ -59,6 +60,17 @@ function estimateFor(offer: JobOffer): number {
   const origin = findTown(plymouthGame.towns, offer.originTownId);
   const destination = findTown(plymouthGame.towns, offer.destinationTownId);
   return estimatedJobMinutes(roadKm(home, origin), roadKm(origin, destination));
+}
+
+function rollMany(rng: number, count: number) {
+  const rolls: boolean[] = [];
+  let current = rng;
+  for (let i = 0; i < count; i++) {
+    const result = offerArrives(current);
+    current = result.state;
+    rolls.push(result.arrives);
+  }
+  return rolls;
 }
 
 describe("generateOffer", () => {
@@ -184,5 +196,15 @@ describe("generateOffer", () => {
     expect(bigCount).toBeLessThanOrEqual(880);
     expect(smallCount).toBeGreaterThanOrEqual(50);
     expect(smallCount).toBeLessThanOrEqual(120);
+  });
+});
+
+describe("offerArrives", () => {
+  it("returns true around 2.5% of the time", () => {
+    const rolls = rollMany(seedRandom(1), 10000);
+    const arrivals = rolls.filter((roll) => roll === true);
+
+    expect(arrivals.length).toBeGreaterThanOrEqual(200);
+    expect(arrivals.length).toBeLessThanOrEqual(300);
   });
 });

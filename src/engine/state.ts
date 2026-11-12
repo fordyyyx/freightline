@@ -7,7 +7,7 @@ import type { Vehicle } from "./vehicles.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
 import type { JobOffer } from "./jobs.ts";
-import { fillBoard, removeExpiredOffers } from "./offers.ts";
+import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 
 export interface Depot {
   readonly id: string;
@@ -70,7 +70,8 @@ export function createGame(
 
 function advanceOneMinute(state: GameState): GameState {
   const ticked = { ...state, minutes: state.minutes + 1 };
-  return removeExpiredOffers(ticked);
+  const offersRemoved = removeExpiredOffers(ticked);
+  return arriveOffers(offersRemoved);
 }
 
 export function advance(state: GameState, ticks: number): GameState {

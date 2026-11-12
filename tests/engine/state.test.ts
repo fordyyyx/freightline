@@ -199,7 +199,44 @@ describe("advance", () => {
     expect(atExpiry.board.map((offer) => offer.id)).not.toContain(earliest?.id);
 
     const remainingIds = atExpiry.board.map((offer) => offer.id);
-    expect(remainingIds).toEqual(laterIds);
+    expect(remainingIds).toEqual(expect.arrayContaining(laterIds));
+  });
+
+  it("never has more than 10 offers on the board", () => {
+    const newGame = createGame(testScenario, towns);
+    let current = newGame;
+
+    for (let i = 0; i < 10000; i += 100) {
+      current = advance(current, 100);
+      expect(current.board.length).toBeLessThanOrEqual(10);
+    }
+  });
+
+  it("reaches 10 offers at some point", () => {
+    const newGame = createGame(testScenario, towns);
+    let current = newGame;
+    let maximumOffers = 0;
+
+    for (let i = 0; i < 10000; i += 100) {
+      current = advance(current, 100);
+      if (current.board.length > maximumOffers) {
+        maximumOffers = current.board.length;
+      }
+    }
+    expect(maximumOffers).toBe(10);
+  });
+
+  it("produces the same game for 1000 ticks at once and for 1000 single ticks", () => {
+    const newGameOne = createGame(testScenario, towns);
+    let newGameTwo = createGame(testScenario, towns);
+
+    const advanced1000 = advance(newGameOne, 1000);
+
+    for (let i = 0; i < 1000; i++) {
+      newGameTwo = advance(newGameTwo, 1);
+    }
+
+    expect(advanced1000).toEqual(newGameTwo);
   });
 });
 

@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { generateOffer, offerArrives } from "../../src/engine/offers.ts";
+import {
+  generateOffer,
+  offerArrives,
+  offerLoadedKm,
+} from "../../src/engine/offers.ts";
 import towns from "../../src/data/towns.json";
 import { balance } from "../../src/engine/balance.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
@@ -45,6 +49,13 @@ const third: Town = {
   id: "T",
   name: "Third",
   lat: 50.4,
+  population: 10000,
+};
+const nearSmall: Town = {
+  ...big,
+  id: "N",
+  name: "NearSmall",
+  lat: 50.3,
   population: 10000,
 };
 
@@ -206,5 +217,16 @@ describe("offerArrives", () => {
 
     expect(arrivals.length).toBeGreaterThanOrEqual(200);
     expect(arrivals.length).toBeLessThanOrEqual(300);
+  });
+});
+
+describe("offerLoadedKm", () => {
+  it("returns the expected value for two known locations", () => {
+    const towns = [small, nearSmall];
+    const newGame = createGame({ ...plymouthSandbox, startTownId: "S" }, towns);
+    const offer = generateOffer(newGame);
+    const loadedKm = offerLoadedKm(towns, offer.offer);
+
+    expect(loadedKm).toBeCloseTo(roadKm(small, nearSmall));
   });
 });

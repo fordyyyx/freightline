@@ -26,3 +26,11 @@ export function formatGameDate(calendarMinutes: number): string {
   const p = Object.fromEntries(dateParts.map((p) => [p.type, p.value]));
   return `${p.weekday} ${p.day} ${p.month} ${p.year}, ${p.hour}:${p.minute}`;
 }
+
+export function formatShortGameTime(calendarMinutes: number): string {
+  const dateParts = dateFormatter.formatToParts(
+    new Date(calendarMinutes * 60_000),
+  );
+  const p = Object.fromEntries(dateParts.map((p) => [p.type, p.value]));
+  return `${p.weekday} ${p.hour}:${p.minute}`;
+}

@@ -15,7 +15,7 @@ import {
   randomBetween,
 } from "./random.ts";
 import type { GameState } from "./state.ts";
-import { depotTowns } from "./world.ts";
+import { depotTowns, findTown, type Town } from "./world.ts";
 import { currentCalendarMinutes } from "./time.ts";
 
 const CARGO_TYPES = Object.keys(balance.cargo) as CargoType[];
@@ -145,4 +145,10 @@ export function arriveOffers(state: GameState): GameState {
     return addNewOffer({ ...state, rngState: roll.state });
   }
   return { ...state, rngState: roll.state };
+}
+
+export function offerLoadedKm(towns: readonly Town[], offer: JobOffer): number {
+  const origin = findTown(towns, offer.originTownId);
+  const destination = findTown(towns, offer.destinationTownId);
+  return roadKm(origin, destination);
 }

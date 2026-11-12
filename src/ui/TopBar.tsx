@@ -1,6 +1,7 @@
 import type { Money } from "../engine/money.ts";
 import { formatGameDate, formatMoney } from "./format.ts";
 import SpeedControls from "./SpeedControls.tsx";
+import "./TopBar.css";
 
 interface TopBarProps {
   companyName: string;

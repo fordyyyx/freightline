@@ -1,5 +1,6 @@
 import type { Speed } from "../engine/clock.ts";
 import { useGameStore } from "./store.ts";
+import "./SpeedControls.css";
 
 const SPEED_OPTIONS: readonly { speed: Speed; label: string }[] = [
   { speed: 0, label: "Pause" },

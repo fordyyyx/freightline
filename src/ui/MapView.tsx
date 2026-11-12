@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "./MapView.css";
 import type { FeatureCollection } from "geojson";
 import landText from "../data/land.geojson?raw";
 import { useGameStore } from "./store.ts";

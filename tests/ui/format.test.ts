@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { formatMoney, formatGameDate } from "../../src/ui/format.ts";
+import {
+  formatMoney,
+  formatGameDate,
+  formatShortGameTime,
+} from "../../src/ui/format.ts";
 import { toCalendarMinutes } from "../../src/engine/time.ts";
 
 describe("formatMoney", () => {
@@ -33,5 +37,25 @@ describe("formatGameDate", () => {
     expect(formatGameDate(toCalendarMinutes(2027, 3, 28, 0, 59) + 1)).toEqual(
       "Sun 28 Mar 2027, 01:00",
     );
+  });
+
+  describe("formatShortGameTime", () => {
+    it("correctly formats a known date", () => {
+      expect(formatShortGameTime(toCalendarMinutes(2027, 3, 1, 8, 0))).toEqual(
+        "Mon 08:00",
+      );
+    });
+
+    it("correctly formats times across days", () => {
+      expect(
+        formatShortGameTime(toCalendarMinutes(2027, 3, 1, 23, 59) + 1),
+      ).toEqual("Tue 00:00");
+    });
+
+    it("correctly uses UTC time format", () => {
+      expect(
+        formatShortGameTime(toCalendarMinutes(2027, 3, 28, 0, 59) + 1),
+      ).toEqual("Sun 01:00");
+    });
   });
 });

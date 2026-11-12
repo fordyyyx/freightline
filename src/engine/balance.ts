@@ -24,4 +24,26 @@ export const balance = {
       maintenancePerKm: 8,
     },
   },
+  jobs: {
+    basePay: 2000,
+    payPerKm: 80,
+    weightBonusPerTonne: 0.3,
+    expressPayMultiplier: 1.4,
+    referenceSpeedKmh: 52,
+  },
+  handling: {
+    loadingMinutes: 20,
+    unloadingMinutes: 20,
+  },
+  cargo: {
+    parcels: { minWeightKg: 50, maxWeightKg: 300, payMultiplier: 1.0 },
+    groceries: { minWeightKg: 100, maxWeightKg: 600, payMultiplier: 1.0 },
+    furniture: { minWeightKg: 200, maxWeightKg: 700, payMultiplier: 1.15 },
+    buildingSupplies: {
+      minWeightKg: 400,
+      maxWeightKg: 1250,
+      payMultiplier: 0.95,
+    },
+    electronics: { minWeightKg: 100, maxWeightKg: 400, payMultiplier: 1.25 },
+  },
 } as const;

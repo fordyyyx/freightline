@@ -25,6 +25,7 @@ export interface GameState {
   readonly startTime: number;
   readonly company: Company;
   readonly towns: readonly Town[];
+  readonly nextJobId: number;
 }
 
 export function createGame(
@@ -58,6 +59,7 @@ export function createGame(
     startTime: scenario.startTime,
     company: startingCompany,
     towns: townsInRange,
+    nextJobId: 1,
   };
 }
 

@@ -1,4 +1,5 @@
 import { balance } from "./balance.ts";
+import type { Money } from "./money.ts";
 
 export type CargoType = keyof typeof balance.cargo;
 export type Urgency = "standard" | "express";
@@ -57,4 +58,17 @@ export function jobDeadline(
     Math.ceil(baseDeadline / QUARTER_HOUR_MINUTES - FLOAT_TOLERANCE) *
     QUARTER_HOUR_MINUTES
   );
+}
+
+export interface JobOffer {
+  readonly id: string;
+  readonly originTownId: string;
+  readonly destinationTownId: string;
+  readonly cargo: CargoType;
+  readonly weightKg: number;
+  readonly urgency: Urgency;
+  readonly pay: Money;
+  readonly createdAt: number; // calendar minutes
+  readonly expiresAt: number; // calendar minutes
+  readonly deadline: number; // calendar minutes
 }

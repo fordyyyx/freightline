@@ -30,6 +30,11 @@ export const balance = {
     weightBonusPerTonne: 0.3,
     expressPayMultiplier: 1.4,
     referenceSpeedKmh: 52,
+    offerLifetimeMinutes: 480,
+    minLoadedKm: 8,
+    expressChance: 0.25,
+    standardSlack: { min: 2.0, max: 3.0 },
+    expressSlack: { min: 1.3, max: 1.6 },
   },
   handling: {
     loadingMinutes: 20,

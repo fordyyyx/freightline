@@ -82,6 +82,7 @@ interface GameState {
   readonly rngState: number; // seeded generator state, saved with the game
   readonly company: Company;
   readonly towns: readonly Town[]; // towns within the job radius of the start town
+  readonly nextJobId: number;
 }
 
 interface Company {

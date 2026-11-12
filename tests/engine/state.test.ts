@@ -95,6 +95,12 @@ describe("createGame", () => {
 
     expect(vehicleOne === vehicleTwo).toBe(false);
   });
+
+  it("gives the correct starting job id", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.nextJobId).toBe(1);
+  });
 });
 
 describe("advance", () => {

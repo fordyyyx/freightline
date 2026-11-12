@@ -1,3 +1,5 @@
+import type { GameState } from "./state.ts";
+
 const MS_PER_MIN = 60_000;
 
 export function toCalendarMinutes(
@@ -9,4 +11,8 @@ export function toCalendarMinutes(
 ): number {
   const epochMs = Date.UTC(year, month - 1, day, hour, minute); // Date.UTC counts months from 0
   return epochMs / MS_PER_MIN;
+}
+
+export function currentCalendarMinutes(state: GameState): number {
+  return state.startTime + state.minutes;
 }

@@ -1,4 +1,5 @@
 import { balance } from "./balance.ts";
+import type { Money } from "./money.ts";
 
 export type CargoType = keyof typeof balance.cargo;
 export type Urgency = "standard" | "express";
@@ -20,18 +21,18 @@ export function jobPay(input: JobPayInput): number {
 
   const cargoMultiplier = balance.cargo[input.cargo].payMultiplier;
   const urgencyMultiplier =
-    input.urgency == "express" ? balance.jobs.expressPayMultiplier : 1.0;
+    input.urgency === "express" ? balance.jobs.expressPayMultiplier : 1.0;
   const weightBonus =
     1 + (balance.jobs.weightBonusPerTonne * input.weightKg) / 1000;
 
-  const jobPay = Math.round(
+  const pounds = Math.round(
     ((basePay + payPerKm * loadedKm) *
       cargoMultiplier *
       urgencyMultiplier *
       weightBonus) /
       100,
   );
-  return jobPay * 100;
+  return pounds * 100;
 }
 
 export function estimatedJobMinutes(
@@ -57,4 +58,17 @@ export function jobDeadline(
     Math.ceil(baseDeadline / QUARTER_HOUR_MINUTES - FLOAT_TOLERANCE) *
     QUARTER_HOUR_MINUTES
   );
+}
+
+export interface JobOffer {
+  readonly id: string;
+  readonly originTownId: string;
+  readonly destinationTownId: string;
+  readonly cargo: CargoType;
+  readonly weightKg: number;
+  readonly urgency: Urgency;
+  readonly pay: Money;
+  readonly createdAt: number; // calendar minutes
+  readonly expiresAt: number; // calendar minutes
+  readonly deadline: number; // calendar minutes
 }

@@ -1,7 +1,7 @@
 import "./App.css";
 import MapView from "./ui/MapView.tsx";
 import TopBar from "./ui/TopBar.tsx";
-import { currentCalendarMinutes } from "./engine/state.ts";
+import { currentCalendarMinutes } from "./engine/time.ts";
 import { useGameLoop } from "./ui/useGameLoop.ts";
 import { useGameStore } from "./ui/store.ts";
 

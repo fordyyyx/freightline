@@ -25,6 +25,7 @@ export interface GameState {
   readonly startTime: number;
   readonly company: Company;
   readonly towns: readonly Town[];
+  readonly nextJobId: number;
 }
 
 export function createGame(
@@ -58,6 +59,7 @@ export function createGame(
     startTime: scenario.startTime,
     company: startingCompany,
     towns: townsInRange,
+    nextJobId: 1,
   };
 }
 
@@ -66,8 +68,4 @@ export function advance(state: GameState, ticks: number): GameState {
     throw new Error(`ticks must be a whole number of 0 or more: ${ticks}`);
   }
   return { ...state, minutes: state.minutes + ticks };
-}
-
-export function currentCalendarMinutes(state: GameState): number {
-  return state.startTime + state.minutes;
 }

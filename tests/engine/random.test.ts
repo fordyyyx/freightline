@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { nextRandom, seedRandom } from "../../src/engine/random.ts";
+import {
+  nextRandom,
+  seedRandom,
+  pickWeighted,
+  randomBetween,
+  randomInt,
+} from "../../src/engine/random.ts";
+import type { RandomResult } from "../../src/engine/random.ts";
 
 function draw(seed: number, count: number): number[] {
   return drawFrom(seedRandom(seed), count).values;
@@ -18,6 +25,59 @@ function drawFrom(
   }
   return { values, state: current };
 }
+
+function pickMany<T>(
+  state: number,
+  items: readonly T[],
+  weightOf: (item: T) => number,
+  count: number,
+): T[] {
+  const picks: T[] = [];
+  let current = state;
+  for (let i = 0; i < count; i++) {
+    const result = pickWeighted(current, items, weightOf);
+    picks.push(result.item);
+    current = result.state;
+  }
+  return picks;
+}
+
+function drawMany(
+  state: number,
+  count: number,
+  draw: (state: number) => RandomResult,
+): number[] {
+  const values: number[] = [];
+  let current = state;
+  for (let i = 0; i < count; i++) {
+    const result = draw(current);
+    values.push(result.value);
+    current = result.state;
+  }
+  return values;
+}
+
+interface TestItem {
+  readonly name: string;
+  readonly weight: number;
+}
+
+const light: TestItem = { name: "light", weight: 1 };
+const heavy: TestItem = { name: "heavy", weight: 9 };
+const zero: TestItem = { name: "zero", weight: 0 };
+
+const badInputs: { label: string; items: TestItem[] }[] = [
+  { label: "an empty list", items: [] },
+  { label: "all zero weights", items: [zero, zero, zero, zero] },
+  {
+    label: "a negative weight",
+    items: [light, heavy, { name: "negative", weight: -1 }],
+  },
+  {
+    label: "an infinite weight",
+    items: [light, heavy, { name: "infinity", weight: Infinity }],
+  },
+];
 
 describe("nextRandom", () => {
   it("produces only values greater than or equal to 0 and less than 1", () => {
@@ -70,5 +130,128 @@ describe("nextRandom", () => {
     expect(values.values[0]).toBe(0.6011037519201636);
     expect(values.values[1]).toBe(0.44829055899754167);
     expect(values.values[2]).toBe(0.8524657934904099);
+  });
+});
+
+describe("pickWeighted", () => {
+  it("returns the same pick when given the same state", () => {
+    const pickOne = pickWeighted(
+      seedRandom(1),
+      [light, heavy],
+      (item) => item.weight,
+    );
+    const pickTwo = pickWeighted(
+      seedRandom(1),
+      [light, heavy],
+      (item) => item.weight,
+    );
+
+    expect(pickOne).toEqual(pickTwo);
+  });
+
+  it("moves the state on when called", () => {
+    const inputState = seedRandom(1);
+    const pick = pickWeighted(
+      inputState,
+      [light, heavy],
+      (item) => item.weight,
+    );
+
+    expect(pick.state === inputState).toBe(false);
+  });
+
+  it("never picks a 0 weighted item", () => {
+    const picks = pickMany(
+      seedRandom(1),
+      [zero, light],
+      (item) => item.weight,
+      1000,
+    );
+    expect(picks).not.toContain(zero);
+  });
+
+  it("picks proportionally according to weights", () => {
+    const picks = pickMany(
+      seedRandom(1),
+      [light, heavy],
+      (item) => item.weight,
+      1000,
+    );
+    const heavyPicks = picks.filter((pick) => pick === heavy);
+
+    expect(heavyPicks.length).toBeGreaterThanOrEqual(850);
+    expect(heavyPicks.length).toBeLessThanOrEqual(950);
+  });
+
+  it.each(badInputs)("throws for $label", ({ items }) => {
+    expect(() =>
+      pickWeighted(seedRandom(1), items, (item) => item.weight),
+    ).toThrow("pickWeighted");
+  });
+
+  it("stays in range on a single item", () => {
+    const five: TestItem = { name: "five", weight: 5 };
+    const picks = pickMany(seedRandom(1), [five], (item) => item.weight, 500);
+    const fivePicks = picks.filter((pick) => pick === five);
+
+    expect(picks).toEqual(fivePicks);
+  });
+});
+
+describe("randomBetween", () => {
+  it("only draws numbers in the given range", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) =>
+      randomBetween(s, 2.0, 3.0),
+    );
+    const inRangeDraws = draws.filter((draw) => draw <= 3.0 && draw >= 2.0);
+
+    expect(draws).toEqual(inRangeDraws);
+  });
+
+  it("returns the same value for the same state", () => {
+    const inputState = seedRandom(1);
+    const drawOne = randomBetween(inputState, 10, 20);
+    const drawTwo = randomBetween(inputState, 10, 20);
+
+    expect(drawOne).toEqual(drawTwo);
+  });
+
+  it("returns a different state than it was passed", () => {
+    const inputState = seedRandom(1);
+    const draw = randomBetween(inputState, 10, 20);
+
+    expect(draw.state).not.toEqual(inputState);
+  });
+});
+
+describe("randomInt", () => {
+  it("always draws whole numbers", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) => randomInt(s, 50, 300));
+    const wholeNumberDraws = draws.filter((draw) => Number.isInteger(draw));
+
+    expect(draws).toEqual(wholeNumberDraws);
+  });
+
+  it("produces the full range of numbers with enough repeats", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) => randomInt(s, 1, 3));
+
+    expect(draws).toContain(1);
+    expect(draws).toContain(2);
+    expect(draws).toContain(3);
+  });
+
+  it("returns the same value for the same state", () => {
+    const inputState = seedRandom(1);
+    const drawOne = randomInt(inputState, 10, 20);
+    const drawTwo = randomInt(inputState, 10, 20);
+
+    expect(drawOne).toEqual(drawTwo);
+  });
+
+  it("returns a different state than it was passed", () => {
+    const inputState = seedRandom(1);
+    const draw = randomInt(inputState, 10, 20);
+
+    expect(draw.state).not.toEqual(inputState);
   });
 });

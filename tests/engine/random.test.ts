@@ -3,7 +3,10 @@ import {
   nextRandom,
   seedRandom,
   pickWeighted,
+  randomBetween,
+  randomInt,
 } from "../../src/engine/random.ts";
+import type { RandomResult } from "../../src/engine/random.ts";
 
 function draw(seed: number, count: number): number[] {
   return drawFrom(seedRandom(seed), count).values;
@@ -37,6 +40,21 @@ function pickMany<T>(
     current = result.state;
   }
   return picks;
+}
+
+function drawMany(
+  state: number,
+  count: number,
+  draw: (state: number) => RandomResult,
+): number[] {
+  const values: number[] = [];
+  let current = state;
+  for (let i = 0; i < count; i++) {
+    const result = draw(current);
+    values.push(result.value);
+    current = result.state;
+  }
+  return values;
 }
 
 interface TestItem {
@@ -115,7 +133,7 @@ describe("nextRandom", () => {
   });
 });
 
-describe("pickWeightes", () => {
+describe("pickWeighted", () => {
   it("returns the same pick when given the same state", () => {
     const pickOne = pickWeighted(
       seedRandom(1),
@@ -177,5 +195,63 @@ describe("pickWeightes", () => {
     const fivePicks = picks.filter((pick) => pick === five);
 
     expect(picks).toEqual(fivePicks);
+  });
+});
+
+describe("randomBetween", () => {
+  it("only draws numbers in the given range", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) =>
+      randomBetween(s, 2.0, 3.0),
+    );
+    const inRangeDraws = draws.filter((draw) => draw <= 3.0 && draw >= 2.0);
+
+    expect(draws).toEqual(inRangeDraws);
+  });
+
+  it("returns the same value for the same state", () => {
+    const inputState = seedRandom(1);
+    const drawOne = randomBetween(inputState, 10, 20);
+    const drawTwo = randomBetween(inputState, 10, 20);
+
+    expect(drawOne).toEqual(drawTwo);
+  });
+
+  it("returns a different state than it was passed", () => {
+    const inputState = seedRandom(1);
+    const draw = randomBetween(inputState, 10, 20);
+
+    expect(draw.state).not.toEqual(inputState);
+  });
+});
+
+describe("randomInt", () => {
+  it("always draws whole numbers", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) => randomInt(s, 50, 300));
+    const wholeNumberDraws = draws.filter((draw) => Number.isInteger(draw));
+
+    expect(draws).toEqual(wholeNumberDraws);
+  });
+
+  it("produces the full range of numbers with enough repeats", () => {
+    const draws = drawMany(seedRandom(1), 1000, (s) => randomInt(s, 1, 3));
+
+    expect(draws).toContain(1);
+    expect(draws).toContain(2);
+    expect(draws).toContain(3);
+  });
+
+  it("returns the same value for the same state", () => {
+    const inputState = seedRandom(1);
+    const drawOne = randomInt(inputState, 10, 20);
+    const drawTwo = randomInt(inputState, 10, 20);
+
+    expect(drawOne).toEqual(drawTwo);
+  });
+
+  it("returns a different state than it was passed", () => {
+    const inputState = seedRandom(1);
+    const draw = randomInt(inputState, 10, 20);
+
+    expect(draw.state).not.toEqual(inputState);
   });
 });

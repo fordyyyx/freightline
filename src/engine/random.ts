@@ -55,3 +55,29 @@ export function pickWeighted<T>(
   }
   return { item: items[lastPositive], state: draw.state };
 }
+
+export function randomBetween(
+  state: number,
+  min: number,
+  max: number,
+): RandomResult {
+  const draw = nextRandom(state);
+  return { value: min + draw.value * (max - min), state: draw.state };
+}
+
+export function randomInt(
+  state: number,
+  min: number,
+  max: number,
+): RandomResult {
+  if (!Number.isInteger(min) || !Number.isInteger(max) || max < min) {
+    throw new Error(
+      "randomInt: min and max must be whole numbers with min <= max",
+    );
+  }
+  const draw = nextRandom(state);
+  return {
+    value: min + Math.floor(draw.value * (max - min + 1)),
+    state: draw.state,
+  };
+}

@@ -1,9 +1,6 @@
 import { describe, it, expect } from "vitest";
-import {
-  advance,
-  createGame,
-  currentCalendarMinutes,
-} from "../../src/engine/state.ts";
+import { advance, createGame } from "../../src/engine/state.ts";
+import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";

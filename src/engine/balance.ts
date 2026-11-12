@@ -35,6 +35,9 @@ export const balance = {
     expressChance: 0.25,
     standardSlack: { min: 2.0, max: 3.0 },
     expressSlack: { min: 1.3, max: 1.6 },
+    maxOpenOffers: 10,
+    initialOffers: 6,
+    meanMinutesBetweenOffers: 40,
   },
   handling: {
     loadingMinutes: 20,

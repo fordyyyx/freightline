@@ -6,6 +6,8 @@ import type { Scenario } from "./scenarios.ts";
 import type { Vehicle } from "./vehicles.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
+import type { JobOffer } from "./jobs.ts";
+import { fillBoard } from "./offers.ts";
 
 export interface Depot {
   readonly id: string;
@@ -26,6 +28,7 @@ export interface GameState {
   readonly company: Company;
   readonly towns: readonly Town[];
   readonly nextJobId: number;
+  readonly board: readonly JobOffer[];
 }
 
 export function createGame(
@@ -53,14 +56,16 @@ export function createGame(
     depots: [startingDepot],
     vehicles: startingVehicles,
   };
-  return {
+  const newGame = {
     minutes: 0,
     rngState: seedRandom(scenario.seed),
     startTime: scenario.startTime,
     company: startingCompany,
     towns: townsInRange,
     nextJobId: 1,
+    board: [],
   };
+  return fillBoard(newGame, balance.jobs.initialOffers);
 }
 
 export function advance(state: GameState, ticks: number): GameState {

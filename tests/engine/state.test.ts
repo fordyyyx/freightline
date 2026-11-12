@@ -4,7 +4,6 @@ import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
-import { seedRandom } from "../../src/engine/random.ts";
 
 const home: Town = {
   id: "T1",
@@ -54,7 +53,6 @@ describe("createGame", () => {
 
     expect(newGame.startTime).toEqual(testScenario.startTime);
     expect(newGame.minutes).toBe(0);
-    expect(newGame.rngState).toEqual(seedRandom(testScenario.seed));
   });
 
   it("throws for a missing start town", () => {
@@ -96,7 +94,20 @@ describe("createGame", () => {
   it("gives the correct starting job id", () => {
     const newGame = createGame(testScenario, towns);
 
-    expect(newGame.nextJobId).toBe(1);
+    expect(newGame.nextJobId).toBe(7);
+  });
+
+  it("draws its randomness from the scenario's seed", () => {
+    const gameA = createGame({ ...testScenario, seed: 1 }, towns);
+    const gameB = createGame({ ...testScenario, seed: 2 }, towns);
+
+    expect(gameA.board).not.toEqual(gameB.board);
+  });
+
+  it("generates 6 jobs for a new game", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.board).toHaveLength(6);
   });
 });
 
@@ -127,8 +138,7 @@ describe("advance", () => {
     const tickSixty = advance(newGame, 60);
 
     expect(tickSixty.minutes).toBe(60);
-    expect(newGame.minutes).toBe(0);
-    expect(newGame.rngState).toBe(seedRandom(testScenario.seed));
+    expect(newGame).toEqual(createGame(testScenario, towns));
   });
 
   it("produces equal results when advancing equal games", () => {

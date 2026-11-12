@@ -107,3 +107,12 @@ export function generateOffer(state: GameState): GeneratedOffer {
     state: { ...state, rngState: rng, nextJobId: state.nextJobId + 1 },
   };
 }
+
+export function fillBoard(state: GameState, count: number) {
+  let current = state;
+  for (let i = 0; i < count; i++) {
+    const result = generateOffer(current);
+    current = { ...result.state, board: [...result.state.board, result.offer] };
+  }
+  return current;
+}

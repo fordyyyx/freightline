@@ -65,7 +65,7 @@ describe("generateOffer", () => {
   it("correctly creates the first offer", () => {
     const offer = generateOffer(plymouthGame);
 
-    expect(offer.offer.id).toBe("job-1");
+    expect(offer.offer.id).toBe("job-7");
     expect(offer.offer.createdAt).toBe(currentCalendarMinutes(plymouthGame));
   });
 

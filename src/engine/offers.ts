@@ -108,11 +108,17 @@ export function generateOffer(state: GameState): GeneratedOffer {
   };
 }
 
-export function fillBoard(state: GameState, count: number) {
+export function fillBoard(state: GameState, count: number): GameState {
   let current = state;
   for (let i = 0; i < count; i++) {
     const result = generateOffer(current);
     current = { ...result.state, board: [...result.state.board, result.offer] };
   }
   return current;
+}
+
+export function removeExpiredOffers(state: GameState): GameState {
+  const now = currentCalendarMinutes(state);
+  const board = state.board.filter((offer) => offer.expiresAt > now);
+  return { ...state, board };
 }

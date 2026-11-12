@@ -177,6 +177,30 @@ describe("advance", () => {
 
     expect(tickNinety).toEqual(tickSixtyAfter);
   });
+
+  it("removes offers on the correct tick", () => {
+    const newGame = createGame(testScenario, towns);
+    const earliestExpiry = Math.min(
+      ...newGame.board.map((offer) => offer.expiresAt),
+    );
+    const earliest = newGame.board.find(
+      (offer) => offer.expiresAt === earliestExpiry,
+    );
+
+    const laterIds = newGame.board
+      .filter((offer) => offer.expiresAt > earliestExpiry)
+      .map((offer) => offer.id);
+
+    const ticksToExpiry = earliestExpiry - currentCalendarMinutes(newGame);
+    const justBefore = advance(newGame, ticksToExpiry - 1);
+    expect(justBefore.board.map((offer) => offer.id)).toContain(earliest?.id);
+
+    const atExpiry = advance(newGame, ticksToExpiry);
+    expect(atExpiry.board.map((offer) => offer.id)).not.toContain(earliest?.id);
+
+    const remainingIds = atExpiry.board.map((offer) => offer.id);
+    expect(remainingIds).toEqual(laterIds);
+  });
 });
 
 describe("currentCalendarMinutes", () => {

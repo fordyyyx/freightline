@@ -7,7 +7,7 @@ import type { Vehicle } from "./vehicles.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
 import type { JobOffer } from "./jobs.ts";
-import { fillBoard } from "./offers.ts";
+import { fillBoard, removeExpiredOffers } from "./offers.ts";
 
 export interface Depot {
   readonly id: string;
@@ -68,9 +68,18 @@ export function createGame(
   return fillBoard(newGame, balance.jobs.initialOffers);
 }
 
+function advanceOneMinute(state: GameState): GameState {
+  const ticked = { ...state, minutes: state.minutes + 1 };
+  return removeExpiredOffers(ticked);
+}
+
 export function advance(state: GameState, ticks: number): GameState {
   if (!Number.isInteger(ticks) || ticks < 0) {
     throw new Error(`ticks must be a whole number of 0 or more: ${ticks}`);
   }
-  return { ...state, minutes: state.minutes + ticks };
+  let current = state;
+  for (let i = 0; i < ticks; i++) {
+    current = advanceOneMinute(current);
+  }
+  return current;
 }

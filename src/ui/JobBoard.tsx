@@ -50,10 +50,9 @@ export default function JobBoard() {
             <tr>
               <th>Route</th>
               <th>Cargo</th>
-              <th>Weight</th>
-              <th>Pay</th>
-              <th>Distance</th>
-              <th>Deadline</th>
+              <th className="job-board__number">Pay</th>
+              <th className="job-board__number">Distance</th>
+              <th className="job-board__number">Deadline</th>
             </tr>
           </thead>
           <tbody>
@@ -66,11 +65,13 @@ export default function JobBoard() {
                   {offer.urgency === "express" && (
                     <span className="job-board__express">Express</span>
                   )}
+                  <span className="job-board__weight">{`${offer.weightKg} kg`}</span>
                 </td>
-                <td>{`${offer.weightKg} kg`}</td>
-                <td>{formatMoney(offer.pay)}</td>
-                <td>{`${Math.round(offerLoadedKm(towns, offer))} km`}</td>
-                <td>{formatShortGameTime(offer.deadline)}</td>
+                <td className="job-board__number">{formatMoney(offer.pay)}</td>
+                <td className="job-board__number">{`${Math.round(offerLoadedKm(towns, offer))} km`}</td>
+                <td className="job-board__number">
+                  {formatShortGameTime(offer.deadline)}
+                </td>
               </tr>
             ))}
           </tbody>

@@ -1,5 +1,5 @@
 .job-board {
-  width: 30rem;
+  flex: 0 0 clamp(24rem, 32vw, 36rem);
   overflow-y: auto;
   background: #2b2b2b;
   color: #e8e8e8;
@@ -52,4 +52,15 @@
   background: #f2a900;
   color: #2b2b2b;
   font-weight: 700;
+}
+
+.job-board__weight {
+  display: block;
+  font-size: 0.85em;
+  color: #b8b8b8;
+}
+
+.job-board__number {
+  white-space: nowrap;
+  text-align: right;
 }

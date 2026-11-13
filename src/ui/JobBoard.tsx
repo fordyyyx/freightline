@@ -56,7 +56,11 @@ export default function JobBoard() {
             </tr>
           </thead>
           <tbody>
-            <tr>{offers.length === 0 && "No jobs available right now"}</tr>
+            {offers.length === 0 && (
+              <tr>
+                <td colSpan={5}>No jobs available right now</td>
+              </tr>
+            )}
             {offers.map((offer) => (
               <tr key={offer.id}>
                 <td>{`${findTown(towns, offer.originTownId).name} → ${findTown(towns, offer.destinationTownId).name}`}</td>

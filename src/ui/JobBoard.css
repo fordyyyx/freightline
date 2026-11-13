@@ -64,3 +64,22 @@
   white-space: nowrap;
   text-align: right;
 }
+
+.job-board__select {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.job-board__select:hover {
+  text-decoration: underline;
+}
+
+.job-board tr:has(.job-board__select[aria-pressed="true"]) {
+  background: #3a3a3a;
+  box-shadow: inset 3px 0 0 #f2a900;
+}

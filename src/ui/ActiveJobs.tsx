@@ -3,6 +3,7 @@ import { findTown } from "../engine/world.ts";
 import { STATUS_LABELS, vehicleLabel } from "./labels.ts";
 import { findVehicle } from "../engine/vehicles.ts";
 import { formatShortGameTime } from "./format.ts";
+import "./ActiveJobs.css";
 
 export default function ActiveJobs() {
   const activeJobs = useGameStore((store) => store.game.activeJobs);

@@ -4,6 +4,7 @@ import { useGameStore } from "./store.ts";
 import type { JobOffer } from "../engine/jobs.ts";
 import { vehicleLabel } from "./labels.ts";
 import { useState } from "react";
+import "./DispatchPanel.css";
 
 interface DispatchPanelProps {
   offer: JobOffer;
@@ -32,7 +33,7 @@ export default function DispatchPanel({ offer, onDone }: DispatchPanelProps) {
   }
 
   return (
-    <div>
+    <div className="dispatch-panel">
       {blocked !== null ? (
         <p className="dispatch-panel__reason">{BLOCK_REASONS[blocked]}</p>
       ) : (

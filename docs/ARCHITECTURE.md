@@ -83,6 +83,7 @@ interface GameState {
   readonly company: Company;
   readonly towns: readonly Town[]; // towns within the job radius of the start town
   readonly nextJobId: number;
+  readonly activeJobs: readonly ActiveJob[];
 }
 
 interface Company {

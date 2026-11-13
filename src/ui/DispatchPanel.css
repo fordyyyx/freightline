@@ -1,0 +1,42 @@
+.dispatch-panel {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #333333;
+  border-left: 3px solid #f2a900;
+  border-radius: 0.375rem;
+}
+
+.dispatch-panel__vans {
+  border: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+}
+
+.dispatch-panel__vans label {
+  display: block;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+.dispatch-panel__reason {
+  margin: 0 0 0.75rem;
+  color: #b8b8b8;
+}
+
+.dispatch-panel button {
+  font: inherit;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background: #f2a900;
+  color: #2b2b2b;
+  cursor: pointer;
+}
+
+.dispatch-panel button:disabled {
+  background: transparent;
+  border: 1px solid #5a5a5a;
+  color: #9a9a9a;
+  cursor: not-allowed;
+}

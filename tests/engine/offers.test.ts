@@ -4,6 +4,7 @@ import {
   offerArrives,
   offerLoadedKm,
 } from "../../src/engine/offers.ts";
+
 import towns from "../../src/data/towns.json";
 import { balance } from "../../src/engine/balance.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
@@ -14,7 +15,9 @@ import type { GeneratedOffer } from "../../src/engine/offers.ts";
 import type { GameState } from "../../src/engine/state.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
-import { estimatedJobMinutes, type JobOffer } from "../../src/engine/jobs";
+import { estimatedJobMinutes } from "../../src/engine/jobs.ts";
+import type { JobOffer } from "../../src/engine/jobs.ts";
+
 import { seedRandom } from "../../src/engine/random.ts";
 
 function generateMany(state: GameState, count: number): GeneratedOffer[] {

@@ -48,6 +48,21 @@ export function estimatedJobMinutes(
   );
 }
 
+export function jobEta(
+  acceptedAt: number,
+  emptyKm: number,
+  loadedKm: number,
+  speedKmh: number,
+): number {
+  return Math.ceil(
+    acceptedAt +
+      ((emptyKm + loadedKm) / speedKmh) * 60 +
+      balance.handling.loadingMinutes +
+      balance.handling.unloadingMinutes -
+      FLOAT_TOLERANCE,
+  );
+}
+
 export function jobDeadline(
   createdAt: number,
   estimateMinutes: number,
@@ -71,4 +86,11 @@ export interface JobOffer {
   readonly createdAt: number; // calendar minutes
   readonly expiresAt: number; // calendar minutes
   readonly deadline: number; // calendar minutes
+}
+
+export interface ActiveJob {
+  readonly job: JobOffer;
+  readonly vehicleId: string;
+  readonly acceptedAt: number; // calendar minutes
+  readonly eta: number; // calendar minutes
 }

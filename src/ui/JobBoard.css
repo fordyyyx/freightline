@@ -1,5 +1,5 @@
 .job-board {
-  width: 30rem;
+  flex: 0 0 clamp(24rem, 32vw, 36rem);
   overflow-y: auto;
   background: #2b2b2b;
   color: #e8e8e8;

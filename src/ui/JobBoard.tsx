@@ -3,9 +3,11 @@ import { useGameStore } from "./store.ts";
 import { sortOffers } from "./sortOffers.ts";
 import { findTown } from "../engine/world.ts";
 import type { OfferSort } from "./sortOffers.ts";
-import type { CargoType } from "../engine/jobs";
+import { CARGO_LABELS } from "./labels.ts";
 import { formatMoney, formatShortGameTime } from "./format.ts";
 import { offerLoadedKm } from "../engine/offers.ts";
+import DispatchPanel from "./DispatchPanel.tsx";
+import ActiveJobs from "./ActiveJobs.tsx";
 import "./JobBoard.css";
 
 const SORT_OPTIONS: readonly { sortBy: OfferSort; label: string }[] = [
@@ -14,14 +16,6 @@ const SORT_OPTIONS: readonly { sortBy: OfferSort; label: string }[] = [
   { sortBy: "deadline", label: "Deadline" },
 ];
 
-const CARGO_LABELS: Record<CargoType, string> = {
-  parcels: "Parcels",
-  groceries: "Groceries",
-  furniture: "Furniture",
-  buildingSupplies: "Building supplies",
-  electronics: "Electronics",
-};
-
 export default function JobBoard() {
   const board = useGameStore((store) => store.game.board);
   const towns = useGameStore((store) => store.game.towns);
@@ -29,6 +23,9 @@ export default function JobBoard() {
   const [sortBy, setSortBy] = useState<OfferSort>("pay");
 
   const offers = sortOffers(board, sortBy, towns);
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = board.find((offer) => offer.id === selectedId);
 
   return (
     <div className="job-board">
@@ -63,7 +60,14 @@ export default function JobBoard() {
             )}
             {offers.map((offer) => (
               <tr key={offer.id}>
-                <td>{`${findTown(towns, offer.originTownId).name} → ${findTown(towns, offer.destinationTownId).name}`}</td>
+                <td>
+                  <button
+                    type="button"
+                    className="job-board__select"
+                    aria-pressed={offer.id === selectedId}
+                    onClick={() => setSelectedId(offer.id)}
+                  >{`${findTown(towns, offer.originTownId).name} → ${findTown(towns, offer.destinationTownId).name}`}</button>
+                </td>
                 <td>
                   {CARGO_LABELS[offer.cargo]}{" "}
                   {offer.urgency === "express" && (
@@ -80,6 +84,14 @@ export default function JobBoard() {
             ))}
           </tbody>
         </table>
+        {selected && (
+          <DispatchPanel
+            key={selected.id}
+            offer={selected}
+            onDone={() => setSelectedId(null)}
+          />
+        )}
+        <ActiveJobs />
       </div>
     </div>
   );

@@ -20,4 +20,17 @@ describe("useGameStore", () => {
     useGameStore.getState().tick(5);
     expect(useGameStore.getState().game.minutes).toBe(5);
   });
+
+  it("accepts a job through the store", () => {
+    const [offer] = useGameStore.getState().game.board;
+    if (offer === undefined) {
+      throw new Error("expected the new game to have offers");
+    }
+
+    useGameStore.getState().acceptJob(offer.id, "vehicle-1");
+
+    const { game } = useGameStore.getState();
+    expect(game.board.map((o) => o.id)).not.toContain(offer.id);
+    expect(game.activeJobs).toHaveLength(1);
+  });
 });

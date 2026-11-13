@@ -72,3 +72,10 @@ export interface JobOffer {
   readonly expiresAt: number; // calendar minutes
   readonly deadline: number; // calendar minutes
 }
+
+export interface ActiveJob {
+  readonly job: JobOffer;
+  readonly vehicleId: string;
+  readonly acceptedAt: number; // calendar minutes
+  readonly eta: number; // calendar minutes
+}

@@ -22,7 +22,7 @@ export function findVehicleModel(id: string): VehicleModel {
   throw new Error(`Vehicle model not found: ${id}`);
 }
 
-export type VehicleStatus = "idle";
+export type VehicleStatus = "idle" | "collecting";
 
 export interface Vehicle {
   readonly id: string;

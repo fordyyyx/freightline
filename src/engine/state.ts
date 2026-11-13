@@ -6,7 +6,7 @@ import type { Scenario } from "./scenarios.ts";
 import type { Vehicle } from "./vehicles.ts";
 import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
-import type { JobOffer } from "./jobs.ts";
+import type { ActiveJob, JobOffer } from "./jobs.ts";
 import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 
 export interface Depot {
@@ -29,6 +29,7 @@ export interface GameState {
   readonly towns: readonly Town[];
   readonly nextJobId: number;
   readonly board: readonly JobOffer[];
+  readonly activeJobs: readonly ActiveJob[];
 }
 
 export function createGame(
@@ -64,6 +65,7 @@ export function createGame(
     towns: townsInRange,
     nextJobId: 1,
     board: [],
+    activeJobs: [],
   };
   return fillBoard(newGame, balance.jobs.initialOffers);
 }

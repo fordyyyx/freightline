@@ -48,6 +48,21 @@ export function estimatedJobMinutes(
   );
 }
 
+export function jobEta(
+  acceptedAt: number,
+  emptyKm: number,
+  loadedKm: number,
+  speedKmh: number,
+): number {
+  return Math.ceil(
+    acceptedAt +
+      ((emptyKm + loadedKm) / speedKmh) * 60 +
+      balance.handling.loadingMinutes +
+      balance.handling.unloadingMinutes -
+      FLOAT_TOLERANCE,
+  );
+}
+
 export function jobDeadline(
   createdAt: number,
   estimateMinutes: number,

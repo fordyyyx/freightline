@@ -22,6 +22,15 @@ export function findVehicleModel(id: string): VehicleModel {
   throw new Error(`Vehicle model not found: ${id}`);
 }
 
+export function findVehicle(vehicles: readonly Vehicle[], id: string): Vehicle {
+  const vehicle = vehicles.find((candidate) => candidate.id === id);
+
+  if (!vehicle) {
+    throw new Error(`Vehicle not found: ${id}`);
+  }
+  return vehicle;
+}
+
 export type VehicleStatus = "idle" | "collecting";
 
 export interface Vehicle {

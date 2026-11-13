@@ -1,4 +1,4 @@
-import type { Vehicle } from "./vehicles.ts";
+import { findVehicle, type Vehicle } from "./vehicles.ts";
 import type { GameState } from "./state.ts";
 import type { JobOffer, ActiveJob } from "./jobs.ts";
 import { balance } from "./balance.ts";
@@ -56,7 +56,7 @@ export function acceptJob(
   if (!offer) {
     throw new Error(`Offer not open: ${jobId}`);
   }
-  const vehicle = vehicles.find((vehicle) => vehicle.id === vehicleId);
+  const vehicle = findVehicle(vehicles, vehicleId);
   if (!vehicle) {
     throw new Error(`Vehicle not found: ${vehicleId}`);
   }

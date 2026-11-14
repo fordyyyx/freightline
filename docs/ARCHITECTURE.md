@@ -283,3 +283,26 @@ npm run data:towns  → src/data/towns.json   (needs the map files first)
 | Accept it                         | None                                       | Unchanged   | Markers visibly in the water                      |
 
 **Consequences.** Every town is on land, guarded by a data test. The coastline's smoothing is still visible when zoomed right in. Revisit when the map grows beyond Devon and Cornwall.
+
+### ADR-007: Stay on GitHub Pages; use AWS only for a backend
+
+**Status:** Proposed · **Date:** 14 November 2026 · **Deciders:** Will
+
+**Context.** Freightline is a static Vite build that `deploy.yml` publishes to GitHub Pages on every push to main. We considered moving it to AWS (S3 and CloudFront) with a custom domain and custom header rules, partly to gain AWS experience. Pages already serves custom domains with free HTTPS, but it can't set custom HTTP response headers. "Freightline" is still a working title, and the Steam gate includes a check on the final name.
+
+**Decision.** Keep the game on GitHub Pages. Don't buy a domain until the name has passed the Steam gate's check. Get AWS experience where the game actually needs a server: the opt-in playtest telemetry backend (E17, see `docs/backlog/E17-playtest-telemetry.md`).
+
+| Option                      | Cost                                                      | Effort                                                  | Notes                                                                        |
+| --------------------------- | --------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **GitHub Pages (chosen)**   | Free                                                      | None: already running                                   | Custom domain and HTTPS supported; no custom response headers                |
+| S3 and CloudFront           | Low, but S3 has no always-free allowance for new accounts | Medium: bucket, distribution, certificate, IaC, billing | Full header control; more to look after, with nothing a player would notice  |
+| Cloudflare Pages or Netlify | Free tier                                                 | Low                                                     | Custom headers through a `_headers` file; the fallback if headers are needed |
+
+**Consequences.**
+
+- Hosting stays free, and the deploy pipeline doesn't change.
+- No custom response headers. A Content-Security-Policy can go in a `<meta>` tag in `index.html`, which covers most directives but not `frame-ancestors` or reporting.
+- The AWS work answers a product need, so it can be explained in an interview as a decision rather than a line in the stack.
+- The game and the telemetry endpoint are on different origins, so the endpoint's CORS must allow the Pages origin.
+
+**Revisit when:** the name is final (point a domain at Pages); a header a `<meta>` tag can't set becomes necessary (move to Cloudflare Pages or Netlify, or put Cloudflare in front); or the game needs server-side features such as accounts or cloud saves.

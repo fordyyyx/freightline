@@ -38,6 +38,8 @@ export const balance = {
     maxOpenOffers: 10,
     initialOffers: 6,
     meanMinutesBetweenOffers: 40,
+    latePenaltyPerHour: 0.1,
+    minLatePayFraction: 0.4,
   },
   handling: {
     loadingMinutes: 20,

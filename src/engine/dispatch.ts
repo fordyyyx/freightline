@@ -139,3 +139,48 @@ export function planTrip(
     unloadingEndsAt,
   };
 }
+
+export interface CompletedJob {
+  readonly job: JobOffer;
+  readonly vehicleId: string;
+  readonly acceptedAt: number; // calendar minutes
+  readonly completedAt: number; // calendar minutes
+}
+
+export function advanceTrips(state: GameState): GameState {
+  const now = currentCalendarMinutes(state);
+
+  const vehicles = state.company.vehicles.map((van): Vehicle => {
+    const active = state.activeJobs.find((a) => a.vehicleId === van.id);
+    if (active === undefined) {
+      return van;
+    }
+    if (now >= active.plan.unloadingEndsAt) {
+      return { ...van, status: "idle", townId: active.job.destinationTownId };
+    }
+    if (now >= active.plan.loadingEndsAt) {
+      return { ...van, status: "delivering" };
+    }
+    return van;
+  });
+
+  const finishedJobs = state.activeJobs.filter(
+    (a) => now >= a.plan.unloadingEndsAt,
+  );
+  const newlyCompleted = finishedJobs.map((active): CompletedJob => ({
+    job: active.job,
+    vehicleId: active.vehicleId,
+    acceptedAt: active.acceptedAt,
+    completedAt: active.plan.unloadingEndsAt,
+  }));
+  const activeJobs = state.activeJobs.filter(
+    (a) => now < a.plan.unloadingEndsAt,
+  );
+
+  return {
+    ...state,
+    completedJobs: [...state.completedJobs, ...newlyCompleted],
+    company: { ...state.company, vehicles },
+    activeJobs,
+  };
+}

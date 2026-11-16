@@ -8,6 +8,8 @@ import { greatCircleKm } from "./distance.ts";
 import { balance } from "./balance.ts";
 import type { ActiveJob, JobOffer } from "./jobs.ts";
 import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
+import type { CompletedJob } from "./dispatch.ts";
+import { advanceTrips } from "./dispatch.ts";
 
 export interface Depot {
   readonly id: string;
@@ -30,6 +32,7 @@ export interface GameState {
   readonly nextJobId: number;
   readonly board: readonly JobOffer[];
   readonly activeJobs: readonly ActiveJob[];
+  readonly completedJobs: readonly CompletedJob[];
 }
 
 export function createGame(
@@ -66,6 +69,7 @@ export function createGame(
     nextJobId: 1,
     board: [],
     activeJobs: [],
+    completedJobs: [],
   };
   return fillBoard(newGame, balance.jobs.initialOffers);
 }
@@ -73,7 +77,8 @@ export function createGame(
 function advanceOneMinute(state: GameState): GameState {
   const ticked = { ...state, minutes: state.minutes + 1 };
   const offersRemoved = removeExpiredOffers(ticked);
-  return arriveOffers(offersRemoved);
+  const tripsAdvanced = advanceTrips(offersRemoved);
+  return arriveOffers(tripsAdvanced);
 }
 
 export function advance(state: GameState, ticks: number): GameState {

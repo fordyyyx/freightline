@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { makeOffer } from "../helpers/offers.ts";
-import type { Vehicle } from "../../src/engine/vehicles.ts";
+import { findVehicle, type Vehicle } from "../../src/engine/vehicles.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
@@ -9,11 +9,16 @@ import {
   eligibleVehicles,
   acceptBlockedReason,
   acceptJob,
+  planTrip,
+  vehiclePositionAt,
 } from "../../src/engine/dispatch.ts";
 import { roadKm } from "../../src/engine/distance.ts";
+import type { Coordinates } from "../../src/engine/distance.ts";
 import type { GameState } from "../../src/engine/state.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
-import { jobEta } from "../../src/engine/jobs.ts";
+import { driveMinutes } from "../../src/engine/jobs.ts";
+import { balance } from "../../src/engine/balance.ts";
+import { vanIn, advanceTo } from "../helpers/state.ts";
 
 const home: Town = {
   id: "T1",
@@ -30,6 +35,11 @@ const twoVehicleScenario: Scenario = {
   ...testScenario,
   startingVehicles: ["compactVan", "panelVan"],
 };
+
+function expectAt(position: Coordinates, town: Town) {
+  expect(position.lat).toBeCloseTo(town.lat, 6);
+  expect(position.lon).toBeCloseTo(town.lon, 6);
+}
 
 describe("eligibleVehicles", () => {
   it("correctly lists eligible vehicles", () => {
@@ -180,14 +190,14 @@ describe("acceptJob", () => {
       (jobOffer) => jobOffer.job.id === "job-test",
     );
 
-    const expectedEta = jobEta(
-      currentCalendarMinutes(state),
-      roadKm(home, near),
-      roadKm(near, home),
-      55,
+    expect(active?.plan).toEqual(
+      planTrip(
+        state.towns,
+        state.company.vehicles[0],
+        offer,
+        currentCalendarMinutes(accepted),
+      ),
     );
-
-    expect(active?.eta).toBe(expectedEta);
   });
 
   it("does not change the original game state", () => {
@@ -312,5 +322,220 @@ describe("acceptJob", () => {
 
     expect(vanOneBefore).not.toEqual(vanOneAfter);
     expect(vanTwoBefore).toEqual(vanTwoAfter);
+  });
+});
+
+describe("planTrip", () => {
+  it("returns expected values for known inputs", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, [home, near, far]);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const trip = planTrip(towns, game.company.vehicles[0], offer, 0);
+    const [empty, loaded] = trip.legs;
+    expect(empty.departsAt).toBe(0);
+    expect(empty.arrivesAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh),
+    );
+    expect(trip.loadingEndsAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes,
+    );
+    expect(loaded.arrivesAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes +
+        driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh),
+    );
+    expect(trip.unloadingEndsAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes +
+        driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.unloadingMinutes,
+    );
+  });
+
+  it("correctly returns a 0 distance empty leg for vans already in the origin town", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T1",
+      destinationTownId: "T2",
+      weightKg: 500,
+    });
+    const trip = planTrip(towns, game.company.vehicles[0], offer, 0);
+    expect(trip.legs[0].arrivesAt).toBe(trip.legs[0].departsAt);
+  });
+});
+
+describe("vehiclePositionAt", () => {
+  it("is at its town when idle", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    expectAt(vehiclePositionAt(game, vanIn(game)), home);
+  });
+
+  it("is at its own town the moment the trip starts", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    expectAt(vehiclePositionAt(accepted, vanIn(accepted)), home);
+  });
+
+  it("is part-way along the empty leg mid-drive", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const [empty] = active.plan.legs;
+    const midTime =
+      empty.departsAt + Math.floor((empty.arrivesAt - empty.departsAt) / 2);
+    const state = advanceTo(accepted, midTime);
+    const fraction =
+      (midTime - empty.departsAt) / (empty.arrivesAt - empty.departsAt);
+
+    const position = vehiclePositionAt(state, vanIn(state));
+    expect(position.lat).toBeCloseTo(
+      home.lat + (near.lat - home.lat) * fraction,
+      6,
+    );
+    expect(position.lon).toBeCloseTo(
+      home.lon + (near.lon - home.lon) * fraction,
+      6,
+    );
+  });
+
+  it("is at the origin town during loading", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const advanced = advanceTo(accepted, active.plan.loadingEndsAt - 1);
+    expectAt(
+      vehiclePositionAt(
+        advanced,
+        findVehicle(game.company.vehicles, "vehicle-1"),
+      ),
+      near,
+    );
+  });
+
+  it("is at the destination town during unloading", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const advanced = advanceTo(accepted, active.plan.unloadingEndsAt - 1);
+    expectAt(
+      vehiclePositionAt(
+        advanced,
+        findVehicle(game.company.vehicles, "vehicle-1"),
+      ),
+      home,
+    );
+  });
+
+  it("correctly displays a second idle van's town", () => {
+    const towns = [home, near, far];
+    const twoVanGame = createGame(twoVehicleScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const vehicleTwoBefore = findVehicle(
+      twoVanGame.company.vehicles,
+      "vehicle-2",
+    );
+    const accepted = acceptJob(
+      { ...twoVanGame, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const vehicleTwoAfter = findVehicle(accepted.company.vehicles, "vehicle-2");
+
+    expect(vehiclePositionAt(accepted, vehicleTwoAfter)).toEqual(
+      vehiclePositionAt(twoVanGame, vehicleTwoBefore),
+    );
+  });
+
+  it("correctly displays a van already at the origin", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const movedVans = game.company.vehicles.map((vehicle) =>
+      vehicle.id === "vehicle-1" ? { ...vehicle, townId: "T2" } : vehicle,
+    );
+
+    const state: GameState = {
+      ...game,
+      company: { ...game.company, vehicles: movedVans },
+    };
+    const accepted = acceptJob(
+      { ...state, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+
+    expectAt(
+      vehiclePositionAt(
+        accepted,
+        findVehicle(accepted.company.vehicles, "vehicle-1"),
+      ),
+      near,
+    );
   });
 });

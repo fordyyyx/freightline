@@ -1,4 +1,5 @@
 import { balance } from "./balance.ts";
+import type { TripPlan } from "./dispatch.ts";
 import type { Money } from "./money.ts";
 
 export type CargoType = keyof typeof balance.cargo;
@@ -48,21 +49,6 @@ export function estimatedJobMinutes(
   );
 }
 
-export function jobEta(
-  acceptedAt: number,
-  emptyKm: number,
-  loadedKm: number,
-  speedKmh: number,
-): number {
-  return Math.ceil(
-    acceptedAt +
-      ((emptyKm + loadedKm) / speedKmh) * 60 +
-      balance.handling.loadingMinutes +
-      balance.handling.unloadingMinutes -
-      FLOAT_TOLERANCE,
-  );
-}
-
 export function jobDeadline(
   createdAt: number,
   estimateMinutes: number,
@@ -92,5 +78,9 @@ export interface ActiveJob {
   readonly job: JobOffer;
   readonly vehicleId: string;
   readonly acceptedAt: number; // calendar minutes
-  readonly eta: number; // calendar minutes
+  readonly plan: TripPlan;
+}
+
+export function driveMinutes(km: number, speedKmh: number): number {
+  return Math.max(0, Math.ceil((km / speedKmh) * 60 - FLOAT_TOLERANCE));
 }

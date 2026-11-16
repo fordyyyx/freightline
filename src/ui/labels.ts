@@ -21,6 +21,7 @@ export const CARGO_LABELS: Record<CargoType, string> = {
 export const STATUS_LABELS: Record<VehicleStatus, string> = {
   idle: "Idle",
   collecting: "Collecting",
+  delivering: "Delivering",
 };
 
 export function vehicleLabel(vehicle: Vehicle): string {

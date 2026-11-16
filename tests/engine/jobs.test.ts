@@ -3,7 +3,7 @@ import {
   jobPay,
   estimatedJobMinutes,
   jobDeadline,
-  jobEta,
+  driveMinutes,
 } from "../../src/engine/jobs.ts";
 import { toCalendarMinutes } from "../../src/engine/time.ts";
 import type { JobPayInput } from "../../src/engine/jobs.ts";
@@ -85,12 +85,9 @@ describe("jobDeadline", () => {
   });
 });
 
-describe("jobEta", () => {
-  it("returns the correct values for known inputs", () => {
-    const etaOne = jobEta(0, 30, 40, 55);
-    const etaTwo = jobEta(0, 22, 0, 55);
-
-    expect(etaOne).toBe(117);
-    expect(etaTwo).toBe(64);
+describe("driveMinutes", () => {
+  it("correctly handling floating point numbers", () => {
+    const minutes = driveMinutes(22, 55);
+    expect(minutes).toBe(24);
   });
 });

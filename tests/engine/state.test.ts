@@ -4,6 +4,9 @@ import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
+import { makeOffer } from "../helpers/offers.ts";
+import { acceptJob } from "../../src/engine/dispatch.ts";
+import { vanIn, advanceTo } from "../helpers/state.ts";
 
 const home: Town = {
   id: "T1",
@@ -23,6 +26,20 @@ const twoVehicleScenario: Scenario = {
   ...testScenario,
   startingVehicles: ["compactVan", "panelVan"],
 };
+
+const game = createGame(testScenario, [home, near, far]);
+const offer = makeOffer({
+  id: "job-test",
+  originTownId: "T2",
+  destinationTownId: "T1",
+  weightKg: 500,
+});
+const accepted = acceptJob(
+  { ...game, board: [offer] },
+  "job-test",
+  "vehicle-1",
+);
+const [active] = accepted.activeJobs;
 
 describe("createGame", () => {
   it("produces the correct company from the scenario", () => {
@@ -237,6 +254,52 @@ describe("advance", () => {
     }
 
     expect(advanced1000).toEqual(newGameTwo);
+  });
+
+  it("is still collecting a minute before loading ends", () => {
+    const state = advanceTo(accepted, active.plan.loadingEndsAt - 1);
+    expect(vanIn(state).status).toBe("collecting");
+  });
+
+  it("starts delivering when loading ends", () => {
+    const state = advanceTo(accepted, active.plan.loadingEndsAt);
+    expect(vanIn(state).status).toBe("delivering");
+  });
+
+  it("completes the job when unloading ends", () => {
+    const state = advanceTo(accepted, active.plan.unloadingEndsAt);
+    expect(vanIn(state).status).toBe("idle");
+    expect(vanIn(state).townId).toBe("T1");
+    expect(state.activeJobs).toEqual([]);
+    expect(state.completedJobs).toHaveLength(1);
+    expect(state.completedJobs[0].completedAt).toBe(
+      active.plan.unloadingEndsAt,
+    );
+  });
+
+  it("is still delivering a minuted before unloading ends", () => {
+    const state = advanceTo(accepted, active.plan.unloadingEndsAt - 1);
+    expect(vanIn(state).status).toBe("delivering");
+  });
+
+  it("stores the history of completed jobs", () => {
+    const state = advanceTo(accepted, active.plan.unloadingEndsAt + 1);
+    expect(state.completedJobs).toHaveLength(1);
+  });
+
+  it("can take a new job after one is completed", () => {
+    const state = advanceTo(accepted, active.plan.unloadingEndsAt);
+    const newOffer = makeOffer({
+      id: "new-job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const newState = { ...state, board: [newOffer] };
+
+    expect(() =>
+      acceptJob(newState, "new-job-test", "vehicle-1"),
+    ).not.toThrow();
   });
 });
 

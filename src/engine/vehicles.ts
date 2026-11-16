@@ -31,7 +31,7 @@ export function findVehicle(vehicles: readonly Vehicle[], id: string): Vehicle {
   return vehicle;
 }
 
-export type VehicleStatus = "idle" | "collecting";
+export type VehicleStatus = "idle" | "collecting" | "delivering";
 
 export interface Vehicle {
   readonly id: string;

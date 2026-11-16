@@ -31,7 +31,7 @@ export default function ActiveJobs() {
                 <td>{vehicleLabel(vehicle)}</td>
                 <td>{STATUS_LABELS[vehicle.status]}</td>
                 <td className="job-board__number">
-                  {formatShortGameTime(active.eta)}
+                  {formatShortGameTime(active.plan.unloadingEndsAt)}
                 </td>
               </tr>
             );

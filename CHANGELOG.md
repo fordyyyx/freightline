@@ -6,6 +6,8 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ### Added
 
+- Accepted jobs now progress from Collecting to Delivering and complete; the van waits at the destination for its next job.
+
 - Accept offers from the job board: choose an offer, pick an idle van that can carry it, and see the job under In progress with its ETA.
 
 - A job board beside the map, listing open offers with route, cargo, pay, distance, and deadline, sortable by pay, distance, or deadline.

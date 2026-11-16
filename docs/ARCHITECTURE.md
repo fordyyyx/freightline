@@ -286,7 +286,7 @@ npm run data:towns  → src/data/towns.json   (needs the map files first)
 
 ### ADR-007: Stay on GitHub Pages; use AWS only for a backend
 
-**Status:** Proposed · **Date:** 14 November 2026 · **Deciders:** Will
+**Status:** Accepted · **Date:** 14 November 2026 · **Deciders:** Will
 
 **Context.** Freightline is a static Vite build that `deploy.yml` publishes to GitHub Pages on every push to main. We considered moving it to AWS (S3 and CloudFront) with a custom domain and custom header rules, partly to gain AWS experience. Pages already serves custom domains with free HTTPS, but it can't set custom HTTP response headers. "Freightline" is still a working title, and the Steam gate includes a check on the final name.
 

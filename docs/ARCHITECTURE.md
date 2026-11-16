@@ -74,6 +74,7 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 | `offers.ts`    | The freight market: `generateOffer`, `fillBoard`, `arriveOffers`, `removeExpiredOffers`, `offerLoadedKm`                                   |
 | `dispatch.ts`  | The fleet at work: `eligibleVehicles`, `acceptBlockedReason`, `acceptJob`, `planTrip`, `advanceTrips`, `vehiclePositionAt`, `CompletedJob` |
 | `balance.ts`   | Tuning constants                                                                                                                           |
+| `ledger.ts`    | `LedgerEntry`, `JobPayEntry`, `postEntry`                                                                                                  |
 
 ### State shape
 
@@ -90,6 +91,7 @@ interface GameState {
   readonly board: readonly JobOffer[]; // open offers, at most jobs.maxOpenOffers
   readonly activeJobs: readonly ActiveJob[]; // accepted jobs whose trips are under way
   readonly completedJobs: readonly CompletedJob[]; // append-only delivery history
+  readonly ledger: readonly LedgerEntry[]; // append-only; cash changes only through postEntry
 }
 
 interface Company {
@@ -156,14 +158,13 @@ The rules are written per leg, not for "the empty leg" and "the loaded leg", so 
 
 ### Completed jobs and the ledger
 
-`completedJobs` records **what happened**: which job, which van, when it was accepted and finished. It's append-only: a finished job is added to the end and never changed or removed. The ledger (#57) will record **money**: every amount in or out, with what it was for. They're linked by job id, and each fact lives in one list only, so the pay actually received is read from the ledger, never copied into the job history.
+`completedJobs` records **what happened**: which job, which van, when it was accepted and finished. It's append-only: a finished job is added to the end and never changed or removed. The ledger records **money**: every amount in or out, with what it was for. They're linked by job id, and each fact lives in one list only, so the pay actually received is read from the ledger, never copied into the job history. Cash is kept on the company but only changed by postEntry, and a test checks it always equals the starting cash plus the sum of the ledger.
 
 Planned additions, each from a Ready issue:
 
-| Field                              | Issue | Notes                                          |
-| ---------------------------------- | ----- | ---------------------------------------------- |
-| Ledger                             | #57   | Append-only; cash changes only through entries |
-| Bankruptcy countdown and game-over | #59   | The failure rule comes from the scenario       |
+| Field                              | Issue | Notes                                    |
+| ---------------------------------- | ----- | ---------------------------------------- |
+| Bankruptcy countdown and game-over | #59   | The failure rule comes from the scenario |
 
 ### Creating a game
 

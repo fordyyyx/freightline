@@ -307,7 +307,7 @@ describe("advance", () => {
   it("correctly updates the ledger for an on time job", () => {
     const newOffer = { ...offer, deadline: start + 10000 };
     const newGame = { ...game, board: [newOffer] };
-    const accepted = acceptJob(newGame, "new-job-test", "vehicle-1");
+    const accepted = acceptJob(newGame, "job-test", "vehicle-1");
     const advanced = advanceTo(
       accepted,
       accepted.activeJobs[0].plan.unloadingEndsAt,
@@ -316,7 +316,7 @@ describe("advance", () => {
     expect(advanced.ledger).toHaveLength(1);
     expect(advanced.ledger[0].late).toBe(false);
     expect(advanced.ledger[0].amount.amount).toBe(5000);
-    expect(advanced.ledger[0].jobId).toBe("new-job-test");
+    expect(advanced.ledger[0].jobId).toBe("job-test");
     expect(advanced.company.cash.amount).toBe(155000);
   });
 

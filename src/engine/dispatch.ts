@@ -4,7 +4,7 @@ import type { JobOffer, ActiveJob } from "./jobs.ts";
 import type { Town } from "./world.ts";
 import { balance } from "./balance.ts";
 import { findTown } from "./world.ts";
-import { roadKm } from "./distance.ts";
+import { roadKm, type Coordinates } from "./distance.ts";
 import { driveMinutes } from "./jobs.ts";
 import { currentCalendarMinutes } from "./time.ts";
 import { offerLoadedKm } from "./offers.ts";
@@ -183,4 +183,38 @@ export function advanceTrips(state: GameState): GameState {
     company: { ...state.company, vehicles },
     activeJobs,
   };
+}
+
+export function vehiclePositionAt(
+  state: GameState,
+  vehicle: Vehicle,
+): Coordinates {
+  const activeJob = state.activeJobs.find(
+    (job) => job.vehicleId === vehicle.id,
+  );
+  if (activeJob === undefined) {
+    return findTown(state.towns, vehicle.townId);
+  }
+  const now = currentCalendarMinutes(state);
+  const legs = activeJob.plan.legs;
+  const current = legs.find(
+    (leg) => leg.departsAt <= now && now < leg.arrivesAt,
+  );
+  if (current !== undefined) {
+    const from = findTown(state.towns, current.fromTownId);
+    const to = findTown(state.towns, current.toTownId);
+    const fraction =
+      (now - current.departsAt) / (current.arrivesAt - current.departsAt);
+    return {
+      lat: from.lat + (to.lat - from.lat) * fraction,
+      lon: from.lon + (to.lon - from.lon) * fraction,
+    };
+  }
+
+  const arrived = legs.filter((leg) => leg.arrivesAt <= now);
+  const last = arrived[arrived.length - 1];
+  return findTown(
+    state.towns,
+    last === undefined ? vehicle.townId : last.toTownId,
+  );
 }

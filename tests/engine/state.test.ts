@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { advance, createGame, type GameState } from "../../src/engine/state.ts";
+import { advance, createGame } from "../../src/engine/state.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
 import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
 import { makeOffer } from "../helpers/offers.ts";
 import { acceptJob } from "../../src/engine/dispatch.ts";
-import { findVehicle, type Vehicle } from "../../src/engine/vehicles.ts";
+import { vanIn, advanceTo } from "../helpers/state.ts";
 
 const home: Town = {
   id: "T1",
@@ -26,14 +26,6 @@ const twoVehicleScenario: Scenario = {
   ...testScenario,
   startingVehicles: ["compactVan", "panelVan"],
 };
-
-function advanceTo(state: GameState, time: number): GameState {
-  return advance(state, time - currentCalendarMinutes(state));
-}
-
-function vanIn(state: GameState): Vehicle {
-  return findVehicle(state.company.vehicles, "vehicle-1");
-}
 
 const game = createGame(testScenario, [home, near, far]);
 const offer = makeOffer({

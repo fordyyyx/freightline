@@ -12,7 +12,12 @@ export interface JobPayEntry extends EntryBase {
   readonly late: boolean;
 }
 
-export type LedgerEntry = JobPayEntry;
+export interface RentEntry extends EntryBase {
+  readonly kind: "rent";
+  readonly depotId: string;
+}
+
+export type LedgerEntry = JobPayEntry | RentEntry;
 
 export function postEntry(state: GameState, entry: LedgerEntry): GameState {
   const companyCurrency = state.company.cash.currency;

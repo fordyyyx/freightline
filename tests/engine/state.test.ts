@@ -312,11 +312,12 @@ describe("advance", () => {
       accepted,
       accepted.activeJobs[0].plan.unloadingEndsAt,
     );
+    const payEntries = advanced.ledger.filter((e) => e.kind === "jobPay");
 
     expect(advanced.ledger).toHaveLength(1);
-    expect(advanced.ledger[0].late).toBe(false);
-    expect(advanced.ledger[0].amount.amount).toBe(5000);
-    expect(advanced.ledger[0].jobId).toBe("job-test");
+    expect(payEntries[0].late).toBe(false);
+    expect(payEntries[0].amount.amount).toBe(5000);
+    expect(payEntries[0].jobId).toBe("job-test");
     expect(advanced.company.cash.amount).toBe(155000);
   });
 
@@ -329,9 +330,11 @@ describe("advance", () => {
       accepted.activeJobs[0].plan.unloadingEndsAt,
     );
 
+    const payEntries = advanced.ledger.filter((e) => e.kind === "jobPay");
+
     expect(advanced.ledger).toHaveLength(1);
-    expect(advanced.ledger[0].late).toBe(true);
-    expect(advanced.ledger[0].amount.amount).toEqual(
+    expect(payEntries[0].late).toBe(true);
+    expect(payEntries[0].amount.amount).toEqual(
       latePay(
         newOffer.pay.amount,
         currentCalendarMinutes(advanced) - newOffer.deadline,
@@ -371,10 +374,12 @@ describe("advance", () => {
     );
     const done = advanceTo(accepted, plan.unloadingEndsAt);
 
+    const payEntries = done.ledger.filter((e) => e.kind === "jobPay");
+
     expect(accepted.activeJobs[0].plan).toEqual(plan);
 
-    expect(done.ledger[0].late).toBe(false);
-    expect(done.ledger[0].amount.amount).toBe(5000);
+    expect(payEntries[0].late).toBe(false);
+    expect(payEntries[0].amount.amount).toBe(5000);
   });
 });
 

@@ -6,6 +6,8 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ### Added
 
+- Each depot costs £40 rent per game day, charges at midnight.
+
 - Deliveries are paid when unloading finishes, with 10% less for each started hour late (down to 40% of the offer); every payment is recorded in the company's ledger.
 
 - Vans appear on the map as square markers that move along their route, with a dashed line to their next stop. Hovering over a van shows what it's doing (driving, loading, or unloading, with times) and when its delivery will finish.

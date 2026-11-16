@@ -65,7 +65,7 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 | `scenarios.ts` | The `Scenario` type and `plymouthSandbox`                                                                                                  |
 | `world.ts`     | The `Town` type; `findTown`, `depotTowns`                                                                                                  |
 | `distance.ts`  | `greatCircleKm` (haversine, IUGG mean radius) and `roadKm` (× `world.roadFactor`)                                                          |
-| `time.ts`      | `toCalendarMinutes`: a UTC calendar date to absolute minutes; `currentCalendarMinutes(state)`                                              |
+| `time.ts`      | `toCalendarMinutes`: a UTC calendar date to absolute minutes; `currentCalendarMinutes(state)`, `isStartOfDay`, `MINUTES_PER_DAY`           |
 | `clock.ts`     | `Speed` and `ticksForFrame`: real frame time to whole game ticks                                                                           |
 | `random.ts`    | `seedRandom`, `nextRandom` (mulberry32), `pickWeighted`, `randomBetween`, `randomInt`                                                      |
 | `money.ts`     | `Money` and `CurrencyCode`                                                                                                                 |
@@ -75,6 +75,7 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 | `dispatch.ts`  | The fleet at work: `eligibleVehicles`, `acceptBlockedReason`, `acceptJob`, `planTrip`, `advanceTrips`, `vehiclePositionAt`, `CompletedJob` |
 | `balance.ts`   | Tuning constants                                                                                                                           |
 | `ledger.ts`    | `LedgerEntry`, `JobPayEntry`, `postEntry`                                                                                                  |
+| `economy.ts`   |                                                                                                                                            |
 
 ### State shape
 
@@ -175,7 +176,7 @@ Planned additions, each from a Ready issue:
 
 ### Advancing time
 
-`advance(state, ticks)` returns a new state. One tick is one game minute. It processes ticks one at a time through `advanceOneMinute`, which adds the minute and then runs each rule in turn: expired offers are removed, new offers may arrive, and trips move on. Every rule that draws randomness or changes state does so per tick, as a small named function. The test that matters: advancing by 90 ticks at once must equal advancing by 30 and then 60, because the frame loop hands over however many ticks fit into each frame.
+`advance(state, ticks)` returns a new state. One tick is one game minute. It processes ticks one at a time through `advanceOneMinute`, which adds the minute and then runs each rule in turn: expired offers are removed, new offers may arrive, rent may be charged, and trips move on. Every rule that draws randomness or changes state does so per tick, as a small named function. The test that matters: advancing by 90 ticks at once must equal advancing by 30 and then 60, because the frame loop hands over however many ticks fit into each frame.
 
 ## Time
 

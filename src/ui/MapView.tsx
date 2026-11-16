@@ -6,6 +6,7 @@ import type { FeatureCollection } from "geojson";
 import landText from "../data/land.geojson?raw";
 import { useGameStore } from "./store.ts";
 import { depotTowns } from "../engine/world.ts";
+import { vehiclePositionAt } from "../engine/dispatch.ts";
 
 const land = JSON.parse(landText) as FeatureCollection;
 
@@ -13,9 +14,13 @@ const START_ZOOM = 8;
 
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const vanMarkersRef = useRef(new Map<string, L.Marker>());
+  const game = useGameStore((store) => store.game);
 
   useEffect(() => {
     const container = containerRef.current;
+    const vanMarkers = vanMarkersRef.current;
     if (container === null) {
       return;
     }
@@ -28,6 +33,7 @@ export default function MapView() {
       center: [home.lat, home.lon],
       zoom: START_ZOOM,
     });
+    mapRef.current = map;
 
     L.geoJSON(land, {
       style: {
@@ -71,8 +77,28 @@ export default function MapView() {
 
     return () => {
       map.remove();
+      mapRef.current = null;
+      vanMarkers.clear();
     };
   }, []);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map === null) {
+      return;
+    }
+    for (const vehicle of game.company.vehicles) {
+      const position = vehiclePositionAt(game, vehicle);
+      const latLng: L.LatLngExpression = [position.lat, position.lon];
+      const existing = vanMarkersRef.current.get(vehicle.id);
+      if (existing === undefined) {
+        const marker = L.marker(latLng).addTo(map);
+        vanMarkersRef.current.set(vehicle.id, marker);
+      } else {
+        existing.setLatLng(latLng);
+      }
+    }
+  }, [game]);
 
   return <div ref={containerRef} className="map" />;
 }

@@ -5,7 +5,7 @@ import type { Town } from "./world.ts";
 import { balance } from "./balance.ts";
 import { findTown } from "./world.ts";
 import { roadKm } from "./distance.ts";
-import { driveMinutes, jobEta } from "./jobs.ts";
+import { driveMinutes } from "./jobs.ts";
 import { currentCalendarMinutes } from "./time.ts";
 import { offerLoadedKm } from "./offers.ts";
 
@@ -70,16 +70,7 @@ export function acceptJob(
   }
 
   const now = currentCalendarMinutes(state);
-  const emptyKm = roadKm(
-    findTown(state.towns, vehicle.townId),
-    findTown(state.towns, offer.originTownId),
-  );
-  const eta = jobEta(
-    now,
-    emptyKm,
-    offerLoadedKm(state.towns, offer),
-    model.speedKmh,
-  );
+  const plan = planTrip(state.towns, vehicle, offer, now);
 
   const newBoard = state.board.filter((job) => job.id !== jobId);
   const newVehicles = vehicles.map((van): Vehicle =>
@@ -91,7 +82,7 @@ export function acceptJob(
       job: offer,
       vehicleId,
       acceptedAt: now,
-      eta,
+      plan,
     },
   ];
   return {

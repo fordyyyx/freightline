@@ -14,7 +14,7 @@ import {
 import { roadKm } from "../../src/engine/distance.ts";
 import type { GameState } from "../../src/engine/state.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
-import { jobEta, driveMinutes } from "../../src/engine/jobs.ts";
+import { driveMinutes } from "../../src/engine/jobs.ts";
 import { balance } from "../../src/engine/balance.ts";
 
 const home: Town = {
@@ -182,14 +182,14 @@ describe("acceptJob", () => {
       (jobOffer) => jobOffer.job.id === "job-test",
     );
 
-    const expectedEta = jobEta(
-      currentCalendarMinutes(state),
-      roadKm(home, near),
-      roadKm(near, home),
-      55,
+    expect(active?.plan).toEqual(
+      planTrip(
+        state.towns,
+        state.company.vehicles[0],
+        offer,
+        currentCalendarMinutes(accepted),
+      ),
     );
-
-    expect(active?.eta).toBe(expectedEta);
   });
 
   it("does not change the original game state", () => {

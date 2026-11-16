@@ -11,6 +11,7 @@ import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 import type { CompletedJob } from "./dispatch.ts";
 import { advanceTrips } from "./dispatch.ts";
 import type { LedgerEntry } from "./ledger.ts";
+import { chargeRent } from "./economy.ts";
 
 export interface Depot {
   readonly id: string;
@@ -81,7 +82,8 @@ function advanceOneMinute(state: GameState): GameState {
   const ticked = { ...state, minutes: state.minutes + 1 };
   const offersRemoved = removeExpiredOffers(ticked);
   const tripsAdvanced = advanceTrips(offersRemoved);
-  return arriveOffers(tripsAdvanced);
+  const rentCharged = chargeRent(tripsAdvanced);
+  return arriveOffers(rentCharged);
 }
 
 export function advance(state: GameState, ticks: number): GameState {

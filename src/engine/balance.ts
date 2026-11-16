@@ -56,4 +56,7 @@ export const balance = {
     },
     electronics: { minWeightKg: 100, maxWeightKg: 400, payMultiplier: 1.25 },
   },
+  economy: {
+    depotRentPerDay: 4000,
+  },
 } as const;

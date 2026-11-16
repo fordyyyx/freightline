@@ -10,6 +10,7 @@ import type { ActiveJob, JobOffer } from "./jobs.ts";
 import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 import type { CompletedJob } from "./dispatch.ts";
 import { advanceTrips } from "./dispatch.ts";
+import type { LedgerEntry } from "./ledger.ts";
 
 export interface Depot {
   readonly id: string;
@@ -33,6 +34,7 @@ export interface GameState {
   readonly board: readonly JobOffer[];
   readonly activeJobs: readonly ActiveJob[];
   readonly completedJobs: readonly CompletedJob[];
+  readonly ledger: readonly LedgerEntry[];
 }
 
 export function createGame(
@@ -70,6 +72,7 @@ export function createGame(
     board: [],
     activeJobs: [],
     completedJobs: [],
+    ledger: [],
   };
   return fillBoard(newGame, balance.jobs.initialOffers);
 }

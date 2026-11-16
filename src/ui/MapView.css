@@ -6,3 +6,25 @@
 .map.leaflet-container {
   background: #a9cfe8;
 }
+
+.van-marker {
+  background: #2b2b2b;
+  border: 2px solid #f2a900;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.van-tooltip {
+  white-space: nowrap;
+  line-height: 1.45;
+  font: inherit;
+}
+
+.van-tooltip__title {
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+
+.van-tooltip__line {
+  color: #444444;
+}

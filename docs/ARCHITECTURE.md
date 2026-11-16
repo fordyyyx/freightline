@@ -2,7 +2,7 @@
 
 How Freightline is put together: the layers, the rules between them, the shape of the game state, and the decisions behind them. [GAME_DESIGN.md](GAME_DESIGN.md) says what the game does and why; this document says how the code does it.
 
-Written at the end of Sprint 1 (10 November 2026). Update it in the same PR as any change that breaks something stated here.
+Written at the end of Sprint 1 (10 November 2026) and updated during Sprint 2 (16 November 2026). Update it in the same PR as any change that breaks something stated here.
 
 ## Overview
 
@@ -59,17 +59,21 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 
 ### Modules
 
-| File           | Holds                                                                              |
-| -------------- | ---------------------------------------------------------------------------------- |
-| `state.ts`     | `GameState`, `Company`, `Depot`; `createGame`, `advance`, `currentCalendarMinutes` |
-| `scenarios.ts` | The `Scenario` type and `plymouthSandbox`                                          |
-| `world.ts`     | The `Town` type; `findTown`, `depotTowns`                                          |
-| `distance.ts`  | `greatCircleKm` (haversine, IUGG mean radius) and `roadKm` (× `world.roadFactor`)  |
-| `time.ts`      | `toCalendarMinutes`: a UTC calendar date to absolute minutes                       |
-| `clock.ts`     | `Speed` and `ticksForFrame`: real frame time to whole game ticks                   |
-| `random.ts`    | `seedRandom` and `nextRandom` (mulberry32)                                         |
-| `money.ts`     | `Money` and `CurrencyCode`                                                         |
-| `balance.ts`   | Tuning constants                                                                   |
+| File           | Holds                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `state.ts`     | `GameState`, `Company`, `Depot`; `createGame`, `advance` (one minute at a time)                                                            |
+| `scenarios.ts` | The `Scenario` type and `plymouthSandbox`                                                                                                  |
+| `world.ts`     | The `Town` type; `findTown`, `depotTowns`                                                                                                  |
+| `distance.ts`  | `greatCircleKm` (haversine, IUGG mean radius) and `roadKm` (× `world.roadFactor`)                                                          |
+| `time.ts`      | `toCalendarMinutes`: a UTC calendar date to absolute minutes; `currentCalendarMinutes(state)`                                              |
+| `clock.ts`     | `Speed` and `ticksForFrame`: real frame time to whole game ticks                                                                           |
+| `random.ts`    | `seedRandom`, `nextRandom` (mulberry32), `pickWeighted`, `randomBetween`, `randomInt`                                                      |
+| `money.ts`     | `Money` and `CurrencyCode`                                                                                                                 |
+| `vehicles.ts`  | `VehicleModel`, `Vehicle`, `VehicleStatus`; `findVehicleModel`, `findVehicle`                                                              |
+| `jobs.ts`      | Pure job maths on plain numbers: `JobOffer`, `ActiveJob`, `jobPay`, `estimatedJobMinutes`, `jobDeadline`, `driveMinutes`                   |
+| `offers.ts`    | The freight market: `generateOffer`, `fillBoard`, `arriveOffers`, `removeExpiredOffers`, `offerLoadedKm`                                   |
+| `dispatch.ts`  | The fleet at work: `eligibleVehicles`, `acceptBlockedReason`, `acceptJob`, `planTrip`, `advanceTrips`, `vehiclePositionAt`, `CompletedJob` |
+| `balance.ts`   | Tuning constants                                                                                                                           |
 
 ### State shape
 
@@ -82,8 +86,10 @@ interface GameState {
   readonly rngState: number; // seeded generator state, saved with the game
   readonly company: Company;
   readonly towns: readonly Town[]; // towns within the job radius of the start town
-  readonly nextJobId: number;
-  readonly activeJobs: readonly ActiveJob[];
+  readonly nextJobId: number; // the next offer is `job-${nextJobId}`
+  readonly board: readonly JobOffer[]; // open offers, at most jobs.maxOpenOffers
+  readonly activeJobs: readonly ActiveJob[]; // accepted jobs whose trips are under way
+  readonly completedJobs: readonly CompletedJob[]; // append-only delivery history
 }
 
 interface Company {
@@ -102,19 +108,62 @@ interface Vehicle {
   readonly id: string;
   readonly modelId: VehicleModelId;
   readonly homeDepotId: string;
-  readonly townId: string;
-  readonly status: VehicleStatus;
+  readonly townId: string; // where it is when idle; where its current trip started otherwise
+  readonly status: VehicleStatus; // "idle" | "collecting" | "delivering"
+}
+
+interface ActiveJob {
+  readonly job: JobOffer;
+  readonly vehicleId: string;
+  readonly acceptedAt: number; // calendar minutes
+  readonly plan: TripPlan; // the ETA is plan.unloadingEndsAt
+}
+
+interface TripPlan {
+  readonly legs: readonly Leg[]; // v0.1: [empty to the pickup, loaded to the destination]
+  readonly loadingEndsAt: number;
+  readonly unloadingEndsAt: number;
+}
+
+interface Leg {
+  readonly fromTownId: string;
+  readonly toTownId: string;
+  readonly departsAt: number; // calendar minutes
+  readonly arrivesAt: number; // calendar minutes
+}
+
+interface CompletedJob {
+  readonly job: JobOffer;
+  readonly vehicleId: string;
+  readonly acceptedAt: number;
+  readonly completedAt: number; // when unloading ended
 }
 ```
 
+`JobOffer` holds its origin and destination town ids, cargo, weight, urgency, pay (as `Money`), and its created, expiry and deadline times in calendar minutes. The loaded distance isn't stored; `offerLoadedKm` works it out from the two towns.
+
+### Trips
+
+When a job is accepted, `planTrip` works out the whole trip at once: the empty leg from the van's town to the pickup, loading, the loaded leg, then unloading. Each leg's drive time is rounded up to whole minutes, so every stage ends on a tick. A van already at the pickup gets an empty leg of zero length.
+
+The plan is stored; nothing else about the journey is.
+
+- **Status** is stored on the vehicle and changed by `advanceTrips`, a step in each minute, when the clock passes `loadingEndsAt` (to `"delivering"`) or `unloadingEndsAt` (to `"idle"`, at the destination town).
+- **Position** is never stored. `vehiclePositionAt` works it out from the plan and the current time: part-way along the current leg by the fraction of its time that has passed, or at the town where the last finished leg ended.
+- **A future delay** (traffic, a handling problem) only needs a later end time in the plan; positions and statuses follow from it.
+
+The rules are written per leg, not for "the empty leg" and "the loaded leg", so trips with more legs (ferries in v0.3) need no change here.
+
+### Completed jobs and the ledger
+
+`completedJobs` records **what happened**: which job, which van, when it was accepted and finished. It's append-only: a finished job is added to the end and never changed or removed. The ledger (#57) will record **money**: every amount in or out, with what it was for. They're linked by job id, and each fact lives in one list only, so the pay actually received is read from the ledger, never copied into the job history.
+
 Planned additions, each from a Ready issue:
 
-| Field                                 | Issue    | Notes                                                                                                   |
-| ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| Job board offers and a job id counter | #51, #52 | Ids come from a counter, not randomness, so equal inputs give equal games                               |
-| Trips as a list of legs               | #55      | Stage end times stored when a job is accepted; status and position are worked out from the current time |
-| Ledger                                | #57      | Append-only; cash changes only through entries                                                          |
-| Bankruptcy countdown and game-over    | #59      | The failure rule comes from the scenario                                                                |
+| Field                              | Issue | Notes                                          |
+| ---------------------------------- | ----- | ---------------------------------------------- |
+| Ledger                             | #57   | Append-only; cash changes only through entries |
+| Bankruptcy countdown and game-over | #59   | The failure rule comes from the scenario       |
 
 ### Creating a game
 
@@ -125,7 +174,7 @@ Planned additions, each from a Ready issue:
 
 ### Advancing time
 
-`advance(state, ticks)` returns a new state. One tick is one game minute. From #52 onwards, `advance` processes ticks one at a time, and every rule that draws randomness or changes state does so per tick. The test that matters: advancing by 90 ticks at once must equal advancing by 30 and then 60, because the frame loop hands over however many ticks fit into each frame.
+`advance(state, ticks)` returns a new state. One tick is one game minute. It processes ticks one at a time through `advanceOneMinute`, which adds the minute and then runs each rule in turn: expired offers are removed, new offers may arrive, and trips move on. Every rule that draws randomness or changes state does so per tick, as a small named function. The test that matters: advancing by 90 ticks at once must equal advancing by 30 and then 60, because the frame loop hands over however many ticks fit into each frame.
 
 ## Time
 
@@ -174,7 +223,7 @@ The loop reads the store with `getState()` inside the frame, rather than subscri
 ## The UI
 
 - **Components subscribe to slices** of the store (`useGameStore((store) => store.game)`), and redraw only when that slice changes.
-- **`MapView` creates the Leaflet map once** and reads towns and depots once, because nothing adds depots or towns mid-game in v0.1. #56 adds a store subscription for vans, which move every tick, and updates their markers in place rather than rebuilding the map.
+- **`MapView` creates the Leaflet map once** and reads towns and depots once, because nothing adds depots or towns mid-game in v0.1. Vans move every tick, so #56 adds a second effect that runs when the game changes and moves the van markers in place (kept in a ref, keyed by vehicle id), rather than rebuilding the map.
 - **Markers are drawn in code** (`circleMarker`), not images, so there are no assets to credit and no Vite image set-up.
 - **Formatting** for money and dates is only in `format.ts`, with one `Intl` formatter per currency created once. `Record<CurrencyCode, …>` makes a new currency fail to compile until it has a formatter.
 

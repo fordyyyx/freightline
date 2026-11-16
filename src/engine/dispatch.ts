@@ -1,4 +1,5 @@
-import { findVehicle, type Vehicle } from "./vehicles.ts";
+import { findVehicle } from "./vehicles.ts";
+import type { Vehicle } from "./vehicles.ts";
 import type { GameState } from "./state.ts";
 import type { JobOffer, ActiveJob } from "./jobs.ts";
 import type { Town } from "./world.ts";
@@ -217,4 +218,28 @@ export function vehiclePositionAt(
     state.towns,
     last === undefined ? vehicle.townId : last.toTownId,
   );
+}
+
+export function vehicleNextStop(
+  state: GameState,
+  vehicle: Vehicle,
+): Town | null {
+  const activeJob = state.activeJobs.find(
+    (job) => job.vehicleId === vehicle.id,
+  );
+  if (activeJob === undefined) {
+    return null;
+  }
+  const now = currentCalendarMinutes(state);
+
+  const legs = activeJob.plan.legs;
+  const current = legs.find(
+    (leg) => leg.departsAt <= now && now < leg.arrivesAt,
+  );
+  if (current !== undefined) {
+    return findTown(state.towns, current.toTownId);
+  }
+
+  const next = legs.find((leg) => leg.departsAt > now);
+  return next === undefined ? null : findTown(state.towns, next.toTownId);
 }

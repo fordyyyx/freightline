@@ -5,8 +5,9 @@ import type { Scenario } from "../../src/engine/scenarios.ts";
 import type { Town } from "../../src/engine/world.ts";
 import { plymouthSandbox } from "../../src/engine/scenarios.ts";
 import { makeOffer } from "../helpers/offers.ts";
-import { acceptJob } from "../../src/engine/dispatch.ts";
+import { acceptJob, planTrip } from "../../src/engine/dispatch.ts";
 import { vanIn, advanceTo } from "../helpers/state.ts";
+import { latePay } from "../../src/engine/jobs.ts";
 
 const home: Town = {
   id: "T1",
@@ -40,6 +41,7 @@ const accepted = acceptJob(
   "vehicle-1",
 );
 const [active] = accepted.activeJobs;
+const start = currentCalendarMinutes(game);
 
 describe("createGame", () => {
   it("produces the correct company from the scenario", () => {
@@ -300,6 +302,79 @@ describe("advance", () => {
     expect(() =>
       acceptJob(newState, "new-job-test", "vehicle-1"),
     ).not.toThrow();
+  });
+
+  it("correctly updates the ledger for an on time job", () => {
+    const newOffer = { ...offer, deadline: start + 10000 };
+    const newGame = { ...game, board: [newOffer] };
+    const accepted = acceptJob(newGame, "new-job-test", "vehicle-1");
+    const advanced = advanceTo(
+      accepted,
+      accepted.activeJobs[0].plan.unloadingEndsAt,
+    );
+
+    expect(advanced.ledger).toHaveLength(1);
+    expect(advanced.ledger[0].late).toBe(false);
+    expect(advanced.ledger[0].amount.amount).toBe(5000);
+    expect(advanced.ledger[0].jobId).toBe("new-job-test");
+    expect(advanced.company.cash.amount).toBe(155000);
+  });
+
+  it("correctly updates the ledger for a late delivery", () => {
+    const newOffer = { ...offer, deadline: start + 1 };
+    const newGame = { ...game, board: [newOffer] };
+    const accepted = acceptJob(newGame, "job-test", "vehicle-1");
+    const advanced = advanceTo(
+      accepted,
+      accepted.activeJobs[0].plan.unloadingEndsAt,
+    );
+
+    expect(advanced.ledger).toHaveLength(1);
+    expect(advanced.ledger[0].late).toBe(true);
+    expect(advanced.ledger[0].amount.amount).toEqual(
+      latePay(
+        newOffer.pay.amount,
+        currentCalendarMinutes(advanced) - newOffer.deadline,
+      ),
+    );
+  });
+
+  it("only pays jobs once", () => {
+    const newOffer = { ...offer, deadline: start + 10000 };
+    const newGame = { ...game, board: [newOffer] };
+    const accepted = acceptJob(newGame, "job-test", "vehicle-1");
+    const advanced = advanceTo(
+      accepted,
+      accepted.activeJobs[0].plan.unloadingEndsAt,
+    );
+    const another = advance(advanced, 60);
+
+    expect(another.ledger).toEqual(advanced.ledger);
+  });
+
+  it("returns as early even for 1 minute early", () => {
+    const [van] = game.company.vehicles;
+    const plan = planTrip(game.towns, van, offer, currentCalendarMinutes(game));
+
+    const onTime = makeOffer({
+      id: "job-on-time",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+      deadline: plan.unloadingEndsAt,
+    });
+
+    const accepted = acceptJob(
+      { ...game, board: [onTime] },
+      "job-on-time",
+      "vehicle-1",
+    );
+    const done = advanceTo(accepted, plan.unloadingEndsAt);
+
+    expect(accepted.activeJobs[0].plan).toEqual(plan);
+
+    expect(done.ledger[0].late).toBe(false);
+    expect(done.ledger[0].amount.amount).toBe(5000);
   });
 });
 

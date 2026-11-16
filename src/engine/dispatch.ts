@@ -6,9 +6,10 @@ import type { Town } from "./world.ts";
 import { balance } from "./balance.ts";
 import { findTown } from "./world.ts";
 import { roadKm, type Coordinates } from "./distance.ts";
-import { driveMinutes } from "./jobs.ts";
+import { driveMinutes, latePay } from "./jobs.ts";
 import { currentCalendarMinutes } from "./time.ts";
 import { offerLoadedKm } from "./offers.ts";
+import { postEntry, type JobPayEntry } from "./ledger.ts";
 
 export interface EligibleVehicle {
   readonly vehicle: Vehicle;
@@ -178,12 +179,28 @@ export function advanceTrips(state: GameState): GameState {
     (a) => now < a.plan.unloadingEndsAt,
   );
 
-  return {
+  let updated: GameState = {
     ...state,
-    completedJobs: [...state.completedJobs, ...newlyCompleted],
     company: { ...state.company, vehicles },
     activeJobs,
+    completedJobs: [...state.completedJobs, ...newlyCompleted],
   };
+  for (const done of newlyCompleted) {
+    const minutesLate = done.completedAt - done.job.deadline;
+    const entry: JobPayEntry = {
+      kind: "jobPay",
+      at: done.completedAt,
+      amount: {
+        amount: latePay(done.job.pay.amount, minutesLate),
+        currency: done.job.pay.currency,
+      },
+      jobId: done.job.id,
+      late: minutesLate > 0,
+    };
+    updated = postEntry(updated, entry);
+  }
+
+  return updated;
 }
 
 export function vehiclePositionAt(

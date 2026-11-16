@@ -4,6 +4,7 @@ import {
   estimatedJobMinutes,
   jobDeadline,
   driveMinutes,
+  latePay,
 } from "../../src/engine/jobs.ts";
 import { toCalendarMinutes } from "../../src/engine/time.ts";
 import type { JobPayInput } from "../../src/engine/jobs.ts";
@@ -89,5 +90,35 @@ describe("driveMinutes", () => {
   it("correctly handling floating point numbers", () => {
     const minutes = driveMinutes(22, 55);
     expect(minutes).toBe(24);
+  });
+});
+
+describe("latePay", () => {
+  it("correctly returns for an early job", () => {
+    expect(latePay(5500, -30)).toBe(5500);
+  });
+
+  it("correctly returns for an on time job", () => {
+    expect(latePay(5500, 0)).toBe(5500);
+  });
+
+  it("correctly returns for a job finished up to 1 hour late", () => {
+    expect(latePay(5500, 1)).toBe(5000);
+  });
+
+  it("correctly returns for a job on the limit of one hour", () => {
+    expect(latePay(5500, 60)).toBe(5000);
+  });
+
+  it("correctly returns for a job two hours late", () => {
+    expect(latePay(5500, 61)).toBe(4400);
+  });
+
+  it("correctly returns at the highest possible penalty", () => {
+    expect(latePay(5500, 360)).toBe(2200);
+  });
+
+  it("does not give a value below 40% of the full pay", () => {
+    expect(latePay(5500, 361)).toBe(2200);
   });
 });

@@ -84,3 +84,15 @@ export interface ActiveJob {
 export function driveMinutes(km: number, speedKmh: number): number {
   return Math.max(0, Math.ceil((km / speedKmh) * 60 - FLOAT_TOLERANCE));
 }
+
+export function latePay(pay: number, minutesLate: number): number {
+  if (minutesLate <= 0) {
+    return pay;
+  }
+  const hours = Math.ceil(minutesLate / 60);
+  const fraction = Math.max(
+    Math.round(balance.jobs.minLatePayFraction * 100),
+    Math.round(100 - hours * balance.jobs.latePenaltyPerHour * 100),
+  );
+  return Math.round((pay * fraction) / 100 / 100) * 100;
+}

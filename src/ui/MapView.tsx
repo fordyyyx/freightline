@@ -16,9 +16,20 @@ const START_ZOOM = 8;
 function tooltipElement(lines: string[]): HTMLElement {
   const element = document.createElement("div");
   element.className = "van-tooltip";
-  element.textContent = lines.join("\n");
+  lines.forEach((text, i) => {
+    const line = document.createElement("div");
+    line.className = i === 0 ? "van-tooltip__title" : "van-tooltip__line";
+    line.textContent = text;
+    element.append(line);
+  });
   return element;
 }
+
+const VAN_ICON = L.divIcon({
+  className: "van-marker",
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
 
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +115,7 @@ export default function MapView() {
       const existing = vanMarkersRef.current.get(vehicle.id);
       const tooltipLines = vanTooltipLines(game, vehicle);
       if (existing === undefined) {
-        const marker = L.marker(latLng)
+        const marker = L.marker(latLng, { icon: VAN_ICON })
           .bindTooltip(tooltipElement(tooltipLines))
           .addTo(map);
         vanMarkersRef.current.set(vehicle.id, marker);

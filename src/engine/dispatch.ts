@@ -1,4 +1,5 @@
-import { findVehicle, type Vehicle } from "./vehicles.ts";
+import { findVehicle } from "./vehicles.ts";
+import type { Vehicle } from "./vehicles.ts";
 import type { GameState } from "./state.ts";
 import type { JobOffer, ActiveJob } from "./jobs.ts";
 import type { Town } from "./world.ts";

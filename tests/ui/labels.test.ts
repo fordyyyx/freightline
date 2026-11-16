@@ -52,8 +52,8 @@ describe("vanTooltipLines", () => {
     expect(vanTooltipLines(advanced, van)).toEqual([
       "Compact van 1",
       "Collecting",
-      "Heading to Near",
-      "ETA Mon 11:02",
+      "Driving to Near, arrives Mon 09:11",
+      "Delivers to Home, ETA Mon 11:02",
     ]);
   });
 
@@ -64,7 +64,7 @@ describe("vanTooltipLines", () => {
     expect(vanTooltipLines(advanced, van)).toEqual([
       "Compact van 1",
       "Delivering",
-      "Unloading at Home",
+      "Unloading at Home until Mon 11:02",
     ]);
     expect(
       vanTooltipLines(advanced, van).some((l) => l.startsWith("ETA")),

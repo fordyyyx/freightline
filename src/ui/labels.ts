@@ -1,11 +1,11 @@
-import type {
-  Vehicle,
-  VehicleModelId,
-  VehicleStatus,
+import {
+  vehicleActivity,
+  type Vehicle,
+  type VehicleModelId,
+  type VehicleStatus,
 } from "../engine/vehicles.ts";
 import type { CargoType } from "../engine/jobs.ts";
 import type { GameState } from "../engine/state.ts";
-import { vehicleNextStop } from "../engine/dispatch.ts";
 import { findTown } from "../engine/world.ts";
 import { formatShortGameTime } from "./format.ts";
 
@@ -33,22 +33,37 @@ export function vehicleLabel(vehicle: Vehicle): string {
 }
 
 export function vanTooltipLines(game: GameState, vehicle: Vehicle): string[] {
-  const nextStop = vehicleNextStop(game, vehicle);
-  const job = game.activeJobs.find((a) => a.vehicleId === vehicle.id);
   const lines = [vehicleLabel(vehicle), STATUS_LABELS[vehicle.status]];
-  if (job === undefined) {
-    lines.push(findTown(game.towns, vehicle.townId).name);
-    return lines;
-  }
-  if (nextStop === null) {
-    lines.push(
-      `Unloading at ${findTown(game.towns, job.job.destinationTownId).name}`,
-    );
-    return lines;
+  const activity = vehicleActivity(game, vehicle);
+  const townName = (id: string) => findTown(game.towns, id).name;
+
+  switch (activity.kind) {
+    case "idle":
+      lines.push(townName(activity.townId));
+      break;
+    case "driving":
+      lines.push(
+        `Driving to ${townName(activity.toTownId)}, arrives ${formatShortGameTime(activity.arrivesAt)}`,
+      );
+      break;
+    case "loading":
+      lines.push(
+        `Loading at ${townName(activity.townId)} until ${formatShortGameTime(activity.until)}`,
+      );
+      break;
+    case "unloading":
+      lines.push(
+        `Unloading at ${townName(activity.townId)} until ${formatShortGameTime(activity.until)}`,
+      );
+      break;
   }
 
-  lines.push(`Heading to ${nextStop.name}`);
-  const eta = job.plan.unloadingEndsAt;
-  lines.push(`ETA ${formatShortGameTime(eta)}`);
+  const active = game.activeJobs.find((job) => job.vehicleId === vehicle.id);
+  if (active !== undefined && activity.kind !== "unloading") {
+    lines.push(
+      `Delivers to ${townName(active.job.destinationTownId)}, ETA ${formatShortGameTime(active.plan.unloadingEndsAt)}`,
+    );
+  }
+
   return lines;
 }

@@ -6,21 +6,31 @@ import type { FeatureCollection } from "geojson";
 import landText from "../data/land.geojson?raw";
 import { useGameStore } from "./store.ts";
 import { depotTowns } from "../engine/world.ts";
-import { vehiclePositionAt } from "../engine/dispatch.ts";
+import { vehicleNextStop, vehiclePositionAt } from "../engine/dispatch.ts";
+import { vanTooltipLines } from "./labels.ts";
 
 const land = JSON.parse(landText) as FeatureCollection;
 
 const START_ZOOM = 8;
 
+function tooltipElement(lines: string[]): HTMLElement {
+  const element = document.createElement("div");
+  element.className = "van-tooltip";
+  element.textContent = lines.join("\n");
+  return element;
+}
+
 export default function MapView() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const vanMarkersRef = useRef(new Map<string, L.Marker>());
+  const routeLinesRef = useRef(new Map<string, L.Polyline>());
   const game = useGameStore((store) => store.game);
 
   useEffect(() => {
     const container = containerRef.current;
     const vanMarkers = vanMarkersRef.current;
+    const routeLines = routeLinesRef.current;
     if (container === null) {
       return;
     }
@@ -79,6 +89,7 @@ export default function MapView() {
       map.remove();
       mapRef.current = null;
       vanMarkers.clear();
+      routeLines.clear();
     };
   }, []);
 
@@ -91,11 +102,30 @@ export default function MapView() {
       const position = vehiclePositionAt(game, vehicle);
       const latLng: L.LatLngExpression = [position.lat, position.lon];
       const existing = vanMarkersRef.current.get(vehicle.id);
+      const tooltipLines = vanTooltipLines(game, vehicle);
       if (existing === undefined) {
-        const marker = L.marker(latLng).addTo(map);
+        const marker = L.marker(latLng)
+          .bindTooltip(tooltipElement(tooltipLines))
+          .addTo(map);
         vanMarkersRef.current.set(vehicle.id, marker);
       } else {
         existing.setLatLng(latLng);
+        existing.setTooltipContent(tooltipElement(tooltipLines));
+      }
+      const nextStop = vehicleNextStop(game, vehicle);
+      const points: L.LatLngExpression[] =
+        nextStop === null ? [] : [latLng, [nextStop.lat, nextStop.lon]];
+      const existingLine = routeLinesRef.current.get(vehicle.id);
+      if (existingLine === undefined) {
+        const line = L.polyline(points, {
+          color: "#2b2b2b",
+          weight: 2,
+          dashArray: "6 6",
+          interactive: false,
+        }).addTo(map);
+        routeLinesRef.current.set(vehicle.id, line);
+      } else {
+        existingLine.setLatLngs(points);
       }
     }
   }, [game]);

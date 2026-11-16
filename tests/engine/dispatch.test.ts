@@ -11,6 +11,7 @@ import {
   acceptJob,
   planTrip,
   vehiclePositionAt,
+  vehicleNextStop,
 } from "../../src/engine/dispatch.ts";
 import { roadKm } from "../../src/engine/distance.ts";
 import type { Coordinates } from "../../src/engine/distance.ts";
@@ -537,5 +538,105 @@ describe("vehiclePositionAt", () => {
       ),
       near,
     );
+  });
+});
+
+describe("vehicleNextStop", () => {
+  it("returns null for an idle van", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+
+    const nextStop = vehicleNextStop(game, game.company.vehicles[0]);
+
+    expect(nextStop).toBe(null);
+  });
+
+  it("returns correctly for a van mid empty leg", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+
+    const nextStop = vehicleNextStop(accepted, accepted.company.vehicles[0]);
+
+    expect(nextStop).toBe(near);
+  });
+
+  it("returns correctly for a van during loading", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const advanced = advanceTo(accepted, active.plan.loadingEndsAt - 1);
+
+    const nextStop = vehicleNextStop(advanced, advanced.company.vehicles[0]);
+
+    expect(nextStop).toBe(home);
+  });
+
+  it("returns correctly for a van mid loaded leg", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const advanced = advanceTo(accepted, active.plan.loadingEndsAt + 1);
+
+    const nextStop = vehicleNextStop(advanced, advanced.company.vehicles[0]);
+
+    expect(nextStop).toBe(home);
+  });
+
+  it("returns correctly for a van during unloading", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, towns);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const accepted = acceptJob(
+      { ...game, board: [offer] },
+      "job-test",
+      "vehicle-1",
+    );
+    const [active] = accepted.activeJobs;
+
+    const advanced = advanceTo(accepted, active.plan.unloadingEndsAt - 1);
+
+    const nextStop = vehicleNextStop(advanced, advanced.company.vehicles[0]);
+
+    expect(nextStop).toBe(null);
   });
 });

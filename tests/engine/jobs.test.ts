@@ -4,6 +4,7 @@ import {
   estimatedJobMinutes,
   jobDeadline,
   jobEta,
+  driveMinutes,
 } from "../../src/engine/jobs.ts";
 import { toCalendarMinutes } from "../../src/engine/time.ts";
 import type { JobPayInput } from "../../src/engine/jobs.ts";
@@ -92,5 +93,12 @@ describe("jobEta", () => {
 
     expect(etaOne).toBe(117);
     expect(etaTwo).toBe(64);
+  });
+});
+
+describe("driveMinutes", () => {
+  it("correctly handling floating point numbers", () => {
+    const minutes = driveMinutes(22, 55);
+    expect(minutes).toBe(24);
   });
 });

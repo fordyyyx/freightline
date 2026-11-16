@@ -1,10 +1,11 @@
 import { findVehicle, type Vehicle } from "./vehicles.ts";
 import type { GameState } from "./state.ts";
 import type { JobOffer, ActiveJob } from "./jobs.ts";
+import type { Town } from "./world.ts";
 import { balance } from "./balance.ts";
 import { findTown } from "./world.ts";
 import { roadKm } from "./distance.ts";
-import { jobEta } from "./jobs.ts";
+import { driveMinutes, jobEta } from "./jobs.ts";
 import { currentCalendarMinutes } from "./time.ts";
 import { offerLoadedKm } from "./offers.ts";
 
@@ -98,5 +99,52 @@ export function acceptJob(
     board: newBoard,
     company: { ...state.company, vehicles: newVehicles },
     activeJobs: newActiveJobs,
+  };
+}
+
+export interface Leg {
+  readonly fromTownId: string;
+  readonly toTownId: string;
+  readonly departsAt: number; // calendar minutes
+  readonly arrivesAt: number; // calendar minutes
+}
+
+export interface TripPlan {
+  readonly legs: readonly Leg[]; // v0.1: [empty, loaded]
+  readonly loadingEndsAt: number;
+  readonly unloadingEndsAt: number;
+}
+
+export function planTrip(
+  towns: readonly Town[],
+  vehicle: Vehicle,
+  offer: JobOffer,
+  now: number,
+): TripPlan {
+  const emptyKm = roadKm(
+    findTown(towns, vehicle.townId),
+    findTown(towns, offer.originTownId),
+  );
+  const vanSpeed = balance.vehicles[vehicle.modelId].speedKmh;
+  const empty: Leg = {
+    fromTownId: vehicle.townId,
+    toTownId: offer.originTownId,
+    departsAt: now,
+    arrivesAt: now + driveMinutes(emptyKm, vanSpeed),
+  };
+  const loadingEndsAt = empty.arrivesAt + balance.handling.loadingMinutes;
+  const loaded: Leg = {
+    fromTownId: offer.originTownId,
+    toTownId: offer.destinationTownId,
+    departsAt: loadingEndsAt,
+    arrivesAt:
+      loadingEndsAt + driveMinutes(offerLoadedKm(towns, offer), vanSpeed),
+  };
+  const unloadingEndsAt = loaded.arrivesAt + balance.handling.unloadingMinutes;
+
+  return {
+    legs: [empty, loaded],
+    loadingEndsAt,
+    unloadingEndsAt,
   };
 }

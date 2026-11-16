@@ -94,3 +94,7 @@ export interface ActiveJob {
   readonly acceptedAt: number; // calendar minutes
   readonly eta: number; // calendar minutes
 }
+
+export function driveMinutes(km: number, speedKmh: number): number {
+  return Math.max(0, Math.ceil((km / speedKmh) * 60 - FLOAT_TOLERANCE));
+}

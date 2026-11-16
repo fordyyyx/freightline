@@ -9,11 +9,13 @@ import {
   eligibleVehicles,
   acceptBlockedReason,
   acceptJob,
+  planTrip,
 } from "../../src/engine/dispatch.ts";
 import { roadKm } from "../../src/engine/distance.ts";
 import type { GameState } from "../../src/engine/state.ts";
 import { currentCalendarMinutes } from "../../src/engine/time.ts";
-import { jobEta } from "../../src/engine/jobs.ts";
+import { jobEta, driveMinutes } from "../../src/engine/jobs.ts";
+import { balance } from "../../src/engine/balance.ts";
 
 const home: Town = {
   id: "T1",
@@ -312,5 +314,52 @@ describe("acceptJob", () => {
 
     expect(vanOneBefore).not.toEqual(vanOneAfter);
     expect(vanTwoBefore).toEqual(vanTwoAfter);
+  });
+});
+
+describe("planTrip", () => {
+  it("returns expected values for known inputs", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, [home, near, far]);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T2",
+      destinationTownId: "T1",
+      weightKg: 500,
+    });
+    const trip = planTrip(towns, game.company.vehicles[0], offer, 0);
+    const [empty, loaded] = trip.legs;
+    expect(empty.departsAt).toBe(0);
+    expect(empty.arrivesAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh),
+    );
+    expect(trip.loadingEndsAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes,
+    );
+    expect(loaded.arrivesAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes +
+        driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh),
+    );
+    expect(trip.unloadingEndsAt).toBe(
+      driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.loadingMinutes +
+        driveMinutes(roadKm(home, near), balance.vehicles.compactVan.speedKmh) +
+        balance.handling.unloadingMinutes,
+    );
+  });
+
+  it("correctly returns a 0 distance empty leg for vans already in the origin town", () => {
+    const towns = [home, near, far];
+    const game = createGame(testScenario, [home, near, far]);
+    const offer = makeOffer({
+      id: "job-test",
+      originTownId: "T1",
+      destinationTownId: "T2",
+      weightKg: 500,
+    });
+    const trip = planTrip(towns, game.company.vehicles[0], offer, 0);
+    expect(trip.legs[0].arrivesAt).toBe(trip.legs[0].departsAt);
   });
 });

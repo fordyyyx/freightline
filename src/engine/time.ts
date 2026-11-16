@@ -1,6 +1,7 @@
 import type { GameState } from "./state.ts";
 
 const MS_PER_MIN = 60_000;
+export const MINUTES_PER_DAY = 1440;
 
 export function toCalendarMinutes(
   year: number,
@@ -15,4 +16,8 @@ export function toCalendarMinutes(
 
 export function currentCalendarMinutes(state: GameState): number {
   return state.startTime + state.minutes;
+}
+
+export function isStartOfDay(calendarMinutes: number): boolean {
+  return calendarMinutes % MINUTES_PER_DAY === 0;
 }

@@ -6,6 +6,8 @@ Notable changes to Freightline, newest first. The format follows [Keep a Changel
 
 ### Added
 
+- Vans appear on the map as square markers that move along their route, with a dashed line to their next stop. Hovering over a van shows what it's doing (driving, loading, or unloading, with times) and when its delivery will finish.
+
 - Accepted jobs now progress from Collecting to Delivering and complete; the van waits at the destination for its next job.
 
 - Accept offers from the job board: choose an offer, pick an idle van that can carry it, and see the job under In progress with its ETA.

@@ -7,6 +7,7 @@ import {
   currentCalendarMinutes,
   toCalendarMinutes,
 } from "../../src/engine/time.ts";
+import { bankruptcyTimeLeft } from "../../src/engine/economy.ts";
 const game = createGame(plymouthSandbox, towns);
 const TO_FIRST_MIDNIGHT = 960;
 
@@ -129,5 +130,42 @@ describe("checkBankruptcy", () => {
     expect(currentCalendarMinutes(advanced)).toEqual(
       game.startTime + TO_FIRST_MIDNIGHT + 1440,
     );
+  });
+});
+
+describe("bankruptcyTimeLeft", () => {
+  it("returns null for a new game", () => {
+    const game = createGame(bankruptcyTest, towns);
+
+    expect(bankruptcyTimeLeft(game)).toBe(null);
+  });
+
+  it("returns a full day on the midnight before the game ends", () => {
+    const game = createGame(bankruptcyTest, towns);
+    const advanced = advance(game, TO_FIRST_MIDNIGHT);
+
+    expect(bankruptcyTimeLeft(advanced)).toBe(1440);
+  });
+
+  it("returns half a day for 12 gours before the game ends", () => {
+    const game = createGame(bankruptcyTest, towns);
+    const advanced = advance(game, TO_FIRST_MIDNIGHT + 720);
+
+    expect(bankruptcyTimeLeft(advanced)).toBe(720);
+  });
+
+  it("returns zero and the game ends on the correct tick", () => {
+    const game = createGame(bankruptcyTest, towns);
+    const advanced = advance(game, TO_FIRST_MIDNIGHT + 1440);
+
+    expect(bankruptcyTimeLeft(advanced)).toBe(0);
+    expect(advanced.gameOver).not.toBe(null);
+  });
+
+  it("never returns less than zero", () => {
+    const game = createGame(bankruptcyTest, towns);
+    const advanced = advance(game, 10000);
+
+    expect(bankruptcyTimeLeft(advanced)).toBe(0);
   });
 });

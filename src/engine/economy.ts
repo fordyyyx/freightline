@@ -51,3 +51,16 @@ export function checkBankruptcy(state: GameState): GameState {
   }
   return state;
 }
+
+export function bankruptcyTimeLeft(state: GameState): number | null {
+  if (state.belowZeroSince === null) {
+    return null;
+  }
+  const now = currentCalendarMinutes(state);
+  return Math.max(
+    0,
+    state.belowZeroSince +
+      state.failureRule.daysBelowZero * MINUTES_PER_DAY -
+      now,
+  );
+}

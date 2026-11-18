@@ -75,7 +75,7 @@ Three layers run in the browser, and one runs only when the data is rebuilt:
 | `dispatch.ts`  | The fleet at work: `eligibleVehicles`, `acceptBlockedReason`, `acceptJob`, `planTrip`, `advanceTrips`, `vehiclePositionAt`, `CompletedJob` |
 | `balance.ts`   | Tuning constants                                                                                                                           |
 | `ledger.ts`    | `LedgerEntry`, `JobPayEntry`, `postEntry`                                                                                                  |
-| `economy.ts`   |                                                                                                                                            |
+| `economy.ts`   | `checkBankruptcy`, `chargeRent`, `bankruptcyTimeLeft`                                                                                      |
 
 ### State shape
 
@@ -93,6 +93,9 @@ interface GameState {
   readonly activeJobs: readonly ActiveJob[]; // accepted jobs whose trips are under way
   readonly completedJobs: readonly CompletedJob[]; // append-only delivery history
   readonly ledger: readonly LedgerEntry[]; // append-only; cash changes only through postEntry
+  readonly failureRule: FailureRule;
+  readonly belowZeroSince: number | null;
+  readonly gameOver: GameOver | null;
 }
 
 interface Company {
@@ -163,9 +166,8 @@ The rules are written per leg, not for "the empty leg" and "the loaded leg", so 
 
 Planned additions, each from a Ready issue:
 
-| Field                              | Issue | Notes                                    |
-| ---------------------------------- | ----- | ---------------------------------------- |
-| Bankruptcy countdown and game-over | #59   | The failure rule comes from the scenario |
+| Field | Issue | Notes |
+| ----- | ----- | ----- |
 
 ### Creating a game
 

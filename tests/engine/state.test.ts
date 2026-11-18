@@ -139,6 +139,30 @@ describe("createGame", () => {
     expect(newGame.belowZeroSince).toBe(null);
     expect(newGame.gameOver).toBe(null);
   });
+
+  it("correctly names a game with a non-default name", () => {
+    const newGame = createGame(testScenario, towns, "Acme");
+
+    expect(newGame.company.name).toEqual("Acme");
+  });
+
+  it("correctly trims company names", () => {
+    const newGame = createGame(testScenario, towns, "  Acme  ");
+
+    expect(newGame.company.name).toEqual("Acme");
+  });
+
+  it("throws for an empty name", () => {
+    expect(() => createGame(testScenario, towns, "")).toThrow(
+      "Invalid company name",
+    );
+  });
+
+  it("uses the default company name when one is not specified", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.company.name).toEqual("PlymFreight");
+  });
 });
 
 describe("advance", () => {

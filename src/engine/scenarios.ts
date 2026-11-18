@@ -35,3 +35,5 @@ export const bankruptcyTest: Scenario = {
   startingCash: { amount: 3000, currency: "GBP" },
   failureRule: { kind: "bankruptcy", daysBelowZero: 1 },
 };
+
+export const SCENARIOS: readonly Scenario[] = [plymouthSandbox];

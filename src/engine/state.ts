@@ -12,6 +12,7 @@ import type { CompletedJob } from "./dispatch.ts";
 import { advanceTrips } from "./dispatch.ts";
 import type { LedgerEntry } from "./ledger.ts";
 import { chargeRent, checkBankruptcy } from "./economy.ts";
+import { companyNameProblem } from "./company.ts";
 
 export interface Depot {
   readonly id: string;
@@ -49,6 +50,7 @@ export interface GameState {
 export function createGame(
   scenario: Scenario,
   towns: readonly Town[],
+  companyName: string = scenario.companyName,
 ): GameState {
   const startTown = findTown(towns, scenario.startTownId);
   const townsInRange = towns.filter(
@@ -65,8 +67,15 @@ export function createGame(
       status: "idle",
     }),
   );
+
+  const name = companyName.trim();
+  const problem = companyNameProblem(name);
+
+  if (problem !== null) {
+    throw new Error(`Invalid company name (${problem}): "${name}"`);
+  }
   const startingCompany = {
-    name: scenario.companyName,
+    name,
     cash: scenario.startingCash,
     depots: [startingDepot],
     vehicles: startingVehicles,

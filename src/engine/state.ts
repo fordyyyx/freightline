@@ -11,7 +11,7 @@ import { arriveOffers, fillBoard, removeExpiredOffers } from "./offers.ts";
 import type { CompletedJob } from "./dispatch.ts";
 import { advanceTrips } from "./dispatch.ts";
 import type { LedgerEntry } from "./ledger.ts";
-import { chargeRent } from "./economy.ts";
+import { chargeRent, checkBankruptcy } from "./economy.ts";
 
 export interface Depot {
   readonly id: string;
@@ -94,16 +94,23 @@ function advanceOneMinute(state: GameState): GameState {
   const offersRemoved = removeExpiredOffers(ticked);
   const tripsAdvanced = advanceTrips(offersRemoved);
   const rentCharged = chargeRent(tripsAdvanced);
-  return arriveOffers(rentCharged);
+  const offersArrived = arriveOffers(rentCharged);
+  return checkBankruptcy(offersArrived); // must stay last: sees the minute's final cash
 }
 
 export function advance(state: GameState, ticks: number): GameState {
   if (!Number.isInteger(ticks) || ticks < 0) {
     throw new Error(`ticks must be a whole number of 0 or more: ${ticks}`);
   }
+  if (state.gameOver !== null) {
+    return state;
+  }
   let current = state;
   for (let i = 0; i < ticks; i++) {
     current = advanceOneMinute(current);
+    if (current.gameOver !== null) {
+      break;
+    }
   }
   return current;
 }

@@ -128,6 +128,17 @@ describe("createGame", () => {
 
     expect(newGame.board).toHaveLength(6);
   });
+
+  it("has the correct failure rules", () => {
+    const newGame = createGame(testScenario, towns);
+
+    expect(newGame.failureRule).toEqual({
+      kind: "bankruptcy",
+      daysBelowZero: 14,
+    });
+    expect(newGame.belowZeroSince).toBe(null);
+    expect(newGame.gameOver).toBe(null);
+  });
 });
 
 describe("advance", () => {

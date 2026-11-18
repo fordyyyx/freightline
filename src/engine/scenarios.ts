@@ -10,7 +10,13 @@ export interface Scenario {
   readonly startingCash: Money;
   readonly seed: number;
   readonly startingVehicles: readonly VehicleModelId[];
+  readonly failureRule: FailureRule;
 }
+
+export type FailureRule = {
+  readonly kind: "bankruptcy";
+  readonly daysBelowZero: number;
+};
 
 export const plymouthSandbox: Scenario = {
   id: "plymouth-sandbox",
@@ -20,4 +26,12 @@ export const plymouthSandbox: Scenario = {
   startingCash: { amount: 150000, currency: "GBP" },
   seed: 1,
   startingVehicles: ["compactVan"],
+  failureRule: { kind: "bankruptcy", daysBelowZero: 14 },
+};
+
+export const bankruptcyTest: Scenario = {
+  ...plymouthSandbox,
+  id: "bankruptcy-test",
+  startingCash: { amount: 3000, currency: "GBP" },
+  failureRule: { kind: "bankruptcy", daysBelowZero: 1 },
 };

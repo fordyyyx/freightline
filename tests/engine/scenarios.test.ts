@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { plymouthSandbox } from "../../src/engine/scenarios.ts";
+import { bankruptcyTest, plymouthSandbox } from "../../src/engine/scenarios.ts";
 import { toCalendarMinutes } from "../../src/engine/time.ts";
 
 describe("plymouthSandbox", () => {
@@ -28,5 +28,24 @@ describe("plymouthSandbox", () => {
 
   it("contains the correct starting van", () => {
     expect(plymouthSandbox.startingVehicles).toEqual(["compactVan"]);
+  });
+
+  it("has bankruptcy as the failure rule", () => {
+    expect(plymouthSandbox.failureRule).toEqual({
+      kind: "bankruptcy",
+      daysBelowZero: 14,
+    });
+  });
+});
+
+describe("bankruptcyTest", () => {
+  it("has the correct starting rules", () => {
+    expect(bankruptcyTest.startTownId).toBe("Q43382");
+    expect(bankruptcyTest.seed).toBe(1);
+    expect(bankruptcyTest.startingCash.amount).toBe(3000);
+    expect(bankruptcyTest.failureRule).toEqual({
+      kind: "bankruptcy",
+      daysBelowZero: 1,
+    });
   });
 });
